@@ -1,4 +1,4 @@
-import { GameId } from '../aggregate'
+import { GameId, GameStatus } from '../aggregate'
 import { DomainEvent } from './domain-event'
 
 export type UpdateGameInfoSchema = {
@@ -11,6 +11,7 @@ export type UpdateGameInfoSchema = {
     imageUrl: string
     frontendUrl: string
     backendUrl: string
+    status: GameStatus
     createdAt: Date
 }
 

@@ -11,6 +11,7 @@ export class Game {
         public imageUrl: string,
         public frontendUrl: string,
         public backendUrl: string,
+        public status: GameStatus = GameStatus.OFFLINE,
         public createdAt: Date,
     ) {
         this.id = id
@@ -24,4 +25,9 @@ export class Game {
         this.backendUrl = backendUrl
         this.createdAt = createdAt
     }
+}
+
+export enum GameStatus {
+    ONLINE = 'ONLINE',
+    OFFLINE = 'OFFLINE',
 }
