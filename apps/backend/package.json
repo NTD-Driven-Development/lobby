@@ -4,9 +4,10 @@
     "description": "",
     "main": "src/index.ts",
     "scripts": {
-        "build": "rm -rf ./dist && esbuild --bundle --platform=node --target=node18 --outdir=dist src/index.ts",
+        "rebuild": "rm -rf ./dist && esbuild --bundle --platform=node --target=node18 --outdir=dist src/index.ts",
+        "build": "esbuild --bundle --platform=node --target=node18 --outdir=dist src/index.ts",
         "start": "node dist/index",
-        "dev": "ts-node-dev --project . --respawn src/index.ts",
+        "dev": "ts-node-dev -r tsconfig-paths/register --project .  --respawn src/index.ts",
         "format": "prettier --no-error-on-unmatched-pattern --write \"src/**/*.ts\" \"test/**/*.ts\"",
         "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint \"{src,apps,libs,test}/**/*.ts\"",
         "typecheck": "tsc --noEmit",
@@ -33,6 +34,7 @@
         "prettier": "^3.2.5",
         "ts-jest": "^29.1.0",
         "ts-node-dev": "^2.0.0",
+        "tsconfig-paths": "^4.2.0",
         "typescript": "^5.4.5",
         "typescript-eslint": "^7.7.1"
     },
