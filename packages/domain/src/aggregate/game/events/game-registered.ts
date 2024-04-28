@@ -1,5 +1,5 @@
-import { GameId, GameStatus } from '../aggregate'
-import { DomainEvent } from './domain-event'
+import { GameId, GameStatus } from '../..'
+import { DomainEvent } from '../../../core/entity'
 
 export type RegisterGameSchema = {
     id: GameId
@@ -12,11 +12,10 @@ export type RegisterGameSchema = {
     frontendUrl: string
     backendUrl: string
     status: GameStatus
-    createdAt: Date
 }
 
-export class GameRegistered extends DomainEvent<RegisterGameSchema> {
+export class GameRegistered extends DomainEvent {
     constructor(public readonly data: RegisterGameSchema) {
-        super('game-registered', data)
+        super('game-registered', new Date())
     }
 }

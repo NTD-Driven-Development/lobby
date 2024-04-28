@@ -1,11 +1,10 @@
-import { Game, GameId } from '@packages/domain'
+import { AbstractRepository, Game, GameId } from '@packages/domain'
 
-export interface GameRepository {
-    existsByUniqueName(uniqueName: string): boolean
-    findById(id: GameId): Game
-    findGameRegistrations(): Game[]
-    getNumberOfTotalGameRegistrations(): number
-    registerGame(data: Game): Game
-    updateGame(data: Game): Game
-    deleteAll(): void
+export interface GameRepository extends AbstractRepository<Game, GameId> {
+    existsByUniqueName(uniqueName: string): Promise<boolean>
+    findById(id: GameId): Promise<Game | null>
+    findGameRegistrations(): Promise<Game[]>
+    getNumberOfTotalGameRegistrations(): Promise<number>
+    save(data: Game): Promise<void>
+    delete(data: Game): Promise<void>
 }

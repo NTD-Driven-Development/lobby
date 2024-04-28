@@ -1,5 +1,5 @@
-import { Game, Player, RoomId } from '../aggregate'
-import { DomainEvent } from './domain-event'
+import { Game, Player, RoomId } from '../..'
+import { DomainEvent } from '../../../core/entity'
 
 export type CreateRoomSchema = {
     id: RoomId
@@ -9,11 +9,11 @@ export type CreateRoomSchema = {
     currentPlayers: Player[]
     minPlayers: number
     maxPlayers: number
-    isLocked: boolean
+    password: string | null
 }
 
-export class RoomCreated extends DomainEvent<CreateRoomSchema> {
+export class RoomCreated extends DomainEvent {
     constructor(public readonly data: CreateRoomSchema) {
-        super('room-created', data)
+        super('room-created', new Date())
     }
 }

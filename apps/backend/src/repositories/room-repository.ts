@@ -1,14 +1,11 @@
-import { Game, PlayerId, Room, RoomId, RoomStatus } from '@packages/domain'
+import { AbstractRepository, Game, PlayerId, Room, RoomId, RoomStatus } from '@packages/domain'
 
-export interface RoomRepository {
-    findById(roomId: RoomId): Room
-    findByStatus(status: RoomStatus): Room[]
-    findWaitingPublicRoomsByGame(game: Game): Room[]
-    existsByHostId(hostId: PlayerId): boolean
-    hasPlayerJoinedRoom(playerId: PlayerId): boolean
-    createRoom(room: Room): Room
-    closeRoom(room: Room): void
-    leaveRoom(room: Room): void
-    update(room: Room): Room
-    deleteAll(): void
+export interface RoomRepository extends AbstractRepository<Room, RoomId> {
+    findById(roomId: RoomId): Promise<Room | null>
+    findByStatus(status: RoomStatus): Promise<Room[]>
+    findWaitingPublicRoomsByGame(game: Game): Promise<Room[]>
+    existsByHostId(hostId: PlayerId): Promise<boolean>
+    hasPlayerJoinedRoom(playerId: PlayerId): Promise<boolean>
+    save(room: Room): Promise<void>
+    delete(room: Room): Promise<void>
 }

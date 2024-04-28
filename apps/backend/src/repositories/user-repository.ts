@@ -1,12 +1,11 @@
-import { User, UserId } from '@packages/domain'
+import { AbstractRepository, User, UserId } from '@packages/domain'
 
-export interface UserRepository {
+export interface UserRepository extends AbstractRepository<User, UserId> {
     existsUserByEmail(email: string): boolean
-    createUser(user: User): User
-    findById(id: UserId): User
-    findAllById(ids: UserId[]): User[]
-    findByEmail(email: string): User
-    findByIdentity(identity: string): User
-    update(user: User): User
-    deleteAll(): void
+    findById(id: UserId): Promise<User | null>
+    findAllById(ids: UserId[]): Promise<User[]>
+    findByEmail(email: string): Promise<User>
+    findByIdentity(identity: string): Promise<User>
+    save(user: User): Promise<void>
+    delete(user: User): Promise<void>
 }
