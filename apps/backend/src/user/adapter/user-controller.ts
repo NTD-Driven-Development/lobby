@@ -1,13 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { FastifyReply, FastifyRequest } from 'fastify'
+import { autoInjectable } from 'tsyringe'
 
+@autoInjectable()
 export class UserController {
-    public static async getUsers(
-        request: FastifyRequest<{
-            Querystring: { name: string }
-        }>,
-        reply: FastifyReply,
-    ) {
+    public async getUsers(request: FastifyRequest, reply: FastifyReply) {
         return 'Hello World!'
     }
 }
