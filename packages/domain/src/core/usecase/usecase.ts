@@ -1,6 +1,3 @@
-import { Input } from './input'
-import { Output } from './output'
-
-export interface UseCase<I extends Input, O extends Output> {
+export interface UseCase<I, O> {
     execute(input: I): O
 }

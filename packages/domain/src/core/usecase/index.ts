@@ -1,5 +1,3 @@
 export * from './abstract-repository'
 export * from './domain-event-bus'
-export * from './input'
-export * from './output'
 export * from './usecase'
