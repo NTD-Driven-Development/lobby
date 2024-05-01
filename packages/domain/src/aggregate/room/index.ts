@@ -63,6 +63,7 @@ export class Room extends AggregateRoot<RoomId> {
             case event instanceof RoomEndedGame:
                 this.status = RoomStatus.WAITING
                 this.gameUrl = null
+                this.cancelReadyExceptHost()
                 break
             case event instanceof RoomChangedHost:
                 this.host = this.findPlayer(event.data.playerId) ?? this.host
@@ -166,7 +167,6 @@ export class Room extends AggregateRoot<RoomId> {
             throw new Error('The game has not started yet')
         }
         this.apply(new RoomEndedGame({ id: this.id }))
-        this.cancelReadyExceptHost()
     }
 
     private cancelReadyExceptHost() {
