@@ -10,8 +10,3 @@ export type UpdateGameInfoCommandSchema = { id: GameId } & Partial<{
     frontendUrl: string
     backendUrl: string
 }>
-
-export type UpdateGameInfoEventSchema = {
-    type: 'update-game-info'
-    data: UpdateGameInfoCommandSchema
-}

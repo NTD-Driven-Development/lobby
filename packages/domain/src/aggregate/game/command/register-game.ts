@@ -8,8 +8,3 @@ export type RegisterGameCommandSchema = {
     frontendUrl: string
     backendUrl: string
 }
-
-export type RegisterGameEventSchema = {
-    type: 'register-game-info'
-    data: RegisterGameCommandSchema
-}
