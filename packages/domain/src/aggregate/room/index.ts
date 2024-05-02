@@ -4,7 +4,7 @@ import { AggregateRoot, DomainEvent } from '../../core'
 import { Game } from '../game'
 import {
     PlayerJoinedRoom,
-    PlayerLeavedRoom,
+    PlayerLeftRoom,
     PlayerReadinessChanged,
     RoomClosed,
     RoomCreated,
@@ -71,7 +71,7 @@ export class Room extends AggregateRoot<RoomId> {
             case event instanceof PlayerJoinedRoom:
                 this.addPlayer(event.data.user)
                 break
-            case event instanceof PlayerLeavedRoom:
+            case event instanceof PlayerLeftRoom:
                 this.removePlayer(event.data.userId)
                 break
             case event instanceof PlayerReadinessChanged:
@@ -122,7 +122,7 @@ export class Room extends AggregateRoot<RoomId> {
         if (!player) {
             throw new Error('Player not found')
         }
-        this.apply(new PlayerLeavedRoom({ roomId: this.id, userId: playerId }))
+        this.apply(new PlayerLeftRoom({ roomId: this.id, userId: playerId }))
         if (this.host.id === playerId) {
             this.apply(new RoomChangedHost({ id: this.id, playerId: this.players[0]?.id }))
         }
@@ -134,7 +134,7 @@ export class Room extends AggregateRoot<RoomId> {
         if (!player) {
             throw new Error('Player not found')
         }
-        this.apply(new PlayerLeavedRoom({ roomId: this.id, userId: playerId }))
+        this.apply(new PlayerLeftRoom({ roomId: this.id, userId: playerId }))
     }
 
     public findPlayer(playerId: PlayerId) {

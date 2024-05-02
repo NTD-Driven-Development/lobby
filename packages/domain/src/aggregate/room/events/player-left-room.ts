@@ -1,13 +1,13 @@
 import { PlayerId, RoomId } from '../..'
 import { DomainEvent } from '../../../core/entity/domain-event'
 
-export type PlayerLeaveRoomSchema = {
+export type PlayerLeftRoomSchema = {
     roomId: RoomId
     userId: PlayerId
 }
 
-export class PlayerLeavedRoom extends DomainEvent {
-    constructor(public readonly data: PlayerLeaveRoomSchema) {
+export class PlayerLeftRoom extends DomainEvent {
+    constructor(public readonly data: PlayerLeftRoomSchema) {
         super('player-leaved-room', new Date())
     }
 }
