@@ -1,3 +1,3 @@
-export * from '@game/index'
-export * from '@user/index'
-export * from '@room/index'
+export * from './game'
+export * from './user'
+export * from './room'

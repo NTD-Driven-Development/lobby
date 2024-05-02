@@ -1,4 +1,4 @@
-import { PlayerId } from '@room/entity'
+import { PlayerId } from '../entity'
 
 export type PlayerJoinRoomCommandSchema = {
     userId: PlayerId

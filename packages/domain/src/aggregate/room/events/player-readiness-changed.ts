@@ -1,6 +1,6 @@
-import { PlayerId, RoomId } from '@room/entity'
-import { DomainEvent } from '~/core/entity/domain-event'
-import { ChangePlayerReadinessCommandSchema } from '@room/command'
+import { PlayerId, RoomId } from '../entity'
+import { DomainEvent } from '../../../core/entity/domain-event'
+import { ChangePlayerReadinessCommandSchema } from '../command'
 
 export type PlayerReadinessChangedSchema = {
     roomId: RoomId

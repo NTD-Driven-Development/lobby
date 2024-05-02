@@ -1,6 +1,6 @@
-import { RoomId } from '@room/entity'
-import { DomainEvent } from '~/core/entity/domain-event'
-import { CloseRoomCommandSchema } from '@room/command'
+import { RoomId } from '../entity'
+import { DomainEvent } from '../../../core/entity/domain-event'
+import { CloseRoomCommandSchema } from '../command'
 
 export type RoomClosedSchema = {
     id: RoomId

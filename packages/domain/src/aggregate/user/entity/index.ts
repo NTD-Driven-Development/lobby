@@ -1,5 +1,5 @@
-import { AggregateRoot, DomainEvent } from '~/core'
-import { UserInfoUpdated, UserRegistered } from '@user/events'
+import { AggregateRoot, DomainEvent } from '../../../core'
+import { UserInfoUpdated, UserRegistered } from '../events'
 
 export type UserId = string
 

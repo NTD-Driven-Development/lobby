@@ -1,4 +1,4 @@
-import { GameId } from '@game/entity'
+import { GameId } from '../entity'
 
 export type UpdateGameInfoCommandSchema = { id: GameId } & Partial<{
     name: string

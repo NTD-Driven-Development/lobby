@@ -1,2 +1,2 @@
-export * from '@user/command/register-user'
-export * from '@user/command/update-user-info'
+export * from './register-user'
+export * from './update-user-info'

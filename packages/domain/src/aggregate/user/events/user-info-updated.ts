@@ -1,6 +1,6 @@
-import { UserId } from '@user/entity'
-import { DomainEvent } from '~/core/entity'
-import { UpdateUserInfoCommandSchema } from '@user/command'
+import { UserId } from '../entity'
+import { DomainEvent } from '../../../core/entity'
+import { UpdateUserInfoCommandSchema } from '../command'
 
 export type UserInfoUpdatedSchema = {
     id: UserId

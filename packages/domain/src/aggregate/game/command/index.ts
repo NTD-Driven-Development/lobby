@@ -1,2 +1,2 @@
-export * from '@game/command/register-game'
-export * from '@game/command/update-game-info'
+export * from './register-game'
+export * from './update-game-info'

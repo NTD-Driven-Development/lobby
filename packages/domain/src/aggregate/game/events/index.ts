@@ -1,2 +1,2 @@
-export * from '@game/events/game-info-updated'
-export * from '@game/events/game-registered'
+export * from './game-info-updated'
+export * from './game-registered'

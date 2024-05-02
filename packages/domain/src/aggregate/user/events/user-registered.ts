@@ -1,6 +1,6 @@
-import { UserId } from '@user/entity'
-import { DomainEvent } from '~/core/entity'
-import { RegisterUserCommandSchema } from '@user/command'
+import { UserId } from '../entity'
+import { DomainEvent } from '../../../core/entity'
+import { RegisterUserCommandSchema } from '../command'
 
 export type UserRegisteredSchema = {
     id: UserId

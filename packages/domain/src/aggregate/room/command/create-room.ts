@@ -1,4 +1,4 @@
-import { Player } from '@room/entity'
+import { Player } from '../entity'
 
 export type CreateRoomCommandSchema = {
     name: string

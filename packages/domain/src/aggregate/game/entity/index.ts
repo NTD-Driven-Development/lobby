@@ -1,6 +1,6 @@
-import { AggregateRoot, DomainEvent } from '~/core'
-import { UpdateGameInfoCommandSchema } from '@game/command/update-game-info'
-import { GameInfoUpdated, GameRegistered } from '@game/events'
+import { AggregateRoot, DomainEvent } from '../../../core'
+import { UpdateGameInfoCommandSchema } from '../command'
+import { GameInfoUpdated, GameRegistered } from '../events'
 
 export type GameId = string
 

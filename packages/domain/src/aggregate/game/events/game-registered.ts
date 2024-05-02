@@ -1,5 +1,5 @@
-import { GameId, GameStatus } from '@game/entity'
-import { DomainEvent } from '~/core/entity'
+import { GameId, GameStatus } from '../entity'
+import { DomainEvent } from '../../../core/entity'
 import { RegisterGameCommandSchema } from '../command'
 
 export type GameRegisteredSchema = {

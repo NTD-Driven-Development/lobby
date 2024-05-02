@@ -1,4 +1,4 @@
-import { AggregateRoot, DomainEvent } from '~/core'
+import { AggregateRoot, DomainEvent } from '../../../core'
 import {
     PlayerJoinedRoom,
     PlayerLeftRoom,
@@ -8,15 +8,15 @@ import {
     RoomEndedGame,
     RoomStartedGame,
     RoomChangedHost,
-} from '@room/events'
+} from '../events'
 import {
     PlayerJoinRoomCommandSchema,
     PlayerLeaveRoomCommandSchema,
     ChangePlayerReadinessCommandSchema,
-} from '@room/command'
-import { ChangeHostCommandSchema } from '../command/change-host'
-import { CloseRoomCommandSchema } from '../command/close-room'
-import { StartGameCommandSchema } from '../command/start-game'
+    ChangeHostCommandSchema,
+    CloseRoomCommandSchema,
+    StartGameCommandSchema,
+} from '../command'
 
 export type RoomId = string
 
