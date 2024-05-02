@@ -1,5 +1,5 @@
-import { GameId, GameStatus } from '../..'
-import { DomainEvent } from '../../../core/entity/domain-event'
+import { GameId, GameStatus } from '@game/index'
+import { DomainEvent } from '~/core/entity/domain-event'
 
 export type GameInfoUpdatedSchema = { id: GameId } & Partial<{
     name: string
@@ -7,7 +7,7 @@ export type GameInfoUpdatedSchema = { id: GameId } & Partial<{
     rule: string
     minPlayers: number
     maxPlayers: number
-    imageUrl: string
+    imageUrl: string | null
     frontendUrl: string
     backendUrl: string
     status: GameStatus

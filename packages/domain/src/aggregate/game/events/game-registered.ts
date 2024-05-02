@@ -1,5 +1,5 @@
-import { GameId, GameStatus } from '../..'
-import { DomainEvent } from '../../../core/entity'
+import { GameId, GameStatus } from '@game/index'
+import { DomainEvent } from '~/core/entity'
 
 export type GameRegisteredSchema = {
     id: GameId

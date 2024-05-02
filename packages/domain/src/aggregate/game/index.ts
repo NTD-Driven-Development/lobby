@@ -1,5 +1,6 @@
-import { AggregateRoot, DomainEvent } from '../../core'
-import { GameInfoUpdated, GameRegistered, GameInfoUpdatedSchema } from './events'
+import { AggregateRoot, DomainEvent } from '~/core'
+import { UpdateGameInfoCommandSchema } from '@game/command/update-game-info'
+import { GameInfoUpdated, GameRegistered } from '@game/events'
 
 export * from './events'
 
@@ -40,8 +41,8 @@ export class Game extends AggregateRoot<GameId> {
         }
     }
 
-    public updateInfo(data: GameInfoUpdatedSchema): void {
-        this.apply(new GameInfoUpdated({ ...data, id: this.id }))
+    public updateInfo(data: UpdateGameInfoCommandSchema): void {
+        this.apply(new GameInfoUpdated({ ...data, status: GameStatus.OFFLINE, id: this.id }))
     }
 
     public changeStatus(status: GameStatus): void {

@@ -1,4 +1,12 @@
 {
-  "extends": "@tsconfig/node-lts",
-  "include": ["src"]
+    "extends": "@tsconfig/node-lts",
+    "include": ["src"],
+    "compilerOptions": {
+        "paths": {
+            "~/*": ["./src/*"],
+            "@game/*": ["./src/aggregate/game/*"],
+            "@room/*": ["./src/aggregate/room/*"],
+            "@user/*": ["./src/aggregate/user/*"],
+        }
+    }
 }
