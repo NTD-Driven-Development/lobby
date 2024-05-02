@@ -1,10 +1,14 @@
-import { Game, Player, RoomId, RoomStatus } from '../..'
-import { DomainEvent } from '../../../core/entity'
+import { Player, RoomId, RoomStatus } from '@room/entity'
+import { DomainEvent } from '~/core/entity/domain-event'
+import { CreateRoomCommandSchema } from '@room/command'
 
 export type RoomCreatedSchema = {
     id: RoomId
     name: string
-    game: Game
+    game: {
+        id: string
+        name: string
+    }
     host: Player
     currentPlayers: Player[]
     minPlayers: number
@@ -20,4 +24,11 @@ export class RoomCreated extends DomainEvent {
     constructor(public readonly data: RoomCreatedSchema) {
         super('room-created', new Date())
     }
+}
+
+export type RoomCreatedEventSchema = RoomCreated
+
+export type CreateRoomEventSchema = {
+    type: 'create-room'
+    data: CreateRoomCommandSchema
 }
