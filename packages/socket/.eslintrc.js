@@ -11,5 +11,7 @@ module.exports = {
         "plugin:@typescript-eslint/recommended",
         "plugin:prettier/recommended",
     ],
-    ignorePatterns: [".eslintrc.js"],
+    rules: {
+        "prettier/prettier": ["error", { "endOfLine": "auto" }]
+    }
 };
