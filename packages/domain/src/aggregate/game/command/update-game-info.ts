@@ -1,4 +1,4 @@
-import { GameId } from '~/aggregate/game'
+import { GameId } from '@game/entity'
 
 export type UpdateGameInfoCommandSchema = { id: GameId } & Partial<{
     name: string

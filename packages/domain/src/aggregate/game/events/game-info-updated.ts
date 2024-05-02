@@ -1,4 +1,4 @@
-import { GameId, GameStatus } from '@game/index'
+import { GameId, GameStatus } from '@game/entity'
 import { DomainEvent } from '~/core/entity/domain-event'
 
 export type GameInfoUpdatedSchema = { id: GameId } & Partial<{
