@@ -26,7 +26,7 @@ export class Room extends AggregateRoot<RoomId> {
         public players: Player[],
         public minPlayers: number,
         public maxPlayers: number,
-        public createdAt: Date,
+        public createdAt: Date = new Date(),
         public status: RoomStatus = RoomStatus.WAITING,
         public password: string | null = null,
         public isClosed: boolean = false,
@@ -36,7 +36,22 @@ export class Room extends AggregateRoot<RoomId> {
             super(id)
         } else {
             super(id)
-            this.apply(new RoomCreated({ id, name, game, host, currentPlayers: players, minPlayers, maxPlayers, password }))
+            this.apply(
+                new RoomCreated({
+                    id,
+                    name,
+                    game,
+                    host,
+                    currentPlayers: players,
+                    minPlayers,
+                    maxPlayers,
+                    password,
+                    status,
+                    isClosed,
+                    gameUrl,
+                    createdAt,
+                }),
+            )
         }
     }
 
@@ -50,23 +65,25 @@ export class Room extends AggregateRoot<RoomId> {
                 this.minPlayers = event.data.minPlayers
                 this.maxPlayers = event.data.maxPlayers
                 this.password = event.data.password
-                this.createdAt = event.getOccurredOn()
-                this.status = RoomStatus.WAITING
+                this.status = event.data.status
+                this.isClosed = event.data.isClosed
+                this.gameUrl = event.data.gameUrl
+                this.createdAt = event.data.createdAt
                 break
             case event instanceof RoomClosed:
-                this.isClosed = true
+                this.isClosed = event.data.isClosed
                 break
             case event instanceof RoomStartedGame:
-                this.status = RoomStatus.PLAYING
+                this.status = event.data.status
                 this.gameUrl = event.data.gameUrl
                 break
             case event instanceof RoomEndedGame:
-                this.status = RoomStatus.WAITING
-                this.gameUrl = null
+                this.status = event.data.status
+                this.gameUrl = event.data.gameUrl
                 this.cancelReadyExceptHost()
                 break
             case event instanceof RoomChangedHost:
-                this.host = this.findPlayer(event.data.playerId) ?? this.host
+                this.host = this.findPlayer(event.data.host) ?? this.host
                 break
             case event instanceof PlayerJoinedRoom:
                 this.addPlayer(event.data.user)
@@ -124,7 +141,7 @@ export class Room extends AggregateRoot<RoomId> {
         }
         this.apply(new PlayerLeftRoom({ roomId: this.id, userId: playerId }))
         if (this.host.id === playerId) {
-            this.apply(new RoomChangedHost({ id: this.id, playerId: this.players[0]?.id }))
+            this.apply(new RoomChangedHost({ id: this.id, host: this.players[0]?.id }))
         }
     }
 
@@ -159,20 +176,26 @@ export class Room extends AggregateRoot<RoomId> {
         if (this.status === RoomStatus.PLAYING) {
             throw new Error('The game has already started')
         }
-        this.apply(new RoomStartedGame({ id: this.id, gameUrl: url }))
+        this.apply(new RoomStartedGame({ id: this.id, gameUrl: url, status: RoomStatus.PLAYING }))
     }
 
     public endGame() {
         if (this.status === RoomStatus.WAITING) {
             throw new Error('The game has not started yet')
         }
-        this.apply(new RoomEndedGame({ id: this.id }))
+        this.apply(new RoomEndedGame({ id: this.id, status: RoomStatus.WAITING, gameUrl: null }))
     }
 
     private cancelReadyExceptHost() {
         this.players.forEach((player) => {
             if (player.id !== this.host.id) {
-                this.apply(new PlayerReadinessChanged({ roomId: this.id, userId: player.id, isReady: false }))
+                this.apply(
+                    new PlayerReadinessChanged({
+                        roomId: this.id,
+                        userId: player.id,
+                        isReady: false,
+                    }),
+                )
             }
         })
     }

@@ -1,7 +1,7 @@
 import { GameId, GameStatus } from '../..'
 import { DomainEvent } from '../../../core/entity'
 
-export type RegisterGameSchema = {
+export type GameRegisteredSchema = {
     id: GameId
     name: string
     description: string
@@ -15,7 +15,7 @@ export type RegisterGameSchema = {
 }
 
 export class GameRegistered extends DomainEvent {
-    constructor(public readonly data: RegisterGameSchema) {
+    constructor(public readonly data: GameRegisteredSchema) {
         super('game-registered', new Date())
     }
 }

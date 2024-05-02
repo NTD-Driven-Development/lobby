@@ -1,12 +1,14 @@
-import { RoomId } from '../..'
+import { RoomId, RoomStatus } from '../..'
 import { DomainEvent } from '../../../core/entity'
 
-export type RoomEndGameSchema = {
+export type RoomEndedGameSchema = {
     id: RoomId
+    status: RoomStatus
+    gameUrl: string | null
 }
 
 export class RoomEndedGame extends DomainEvent {
-    constructor(public readonly data: RoomEndGameSchema) {
+    constructor(public readonly data: RoomEndedGameSchema) {
         super('room-ended-game', new Date())
     }
 }

@@ -3,7 +3,7 @@ import { DomainEvent } from '../../../core/entity'
 
 export type RoomChangedHostSchema = {
     id: RoomId
-    playerId: PlayerId
+    host: PlayerId
 }
 
 export class RoomChangedHost extends DomainEvent {

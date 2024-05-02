@@ -1,7 +1,7 @@
 import { GameId, GameStatus } from '../..'
 import { DomainEvent } from '../../../core/entity/domain-event'
 
-export type UpdateGameInfoSchema = { id: GameId } & Partial<{
+export type GameInfoUpdatedSchema = { id: GameId } & Partial<{
     name: string
     description: string
     rule: string
@@ -14,7 +14,7 @@ export type UpdateGameInfoSchema = { id: GameId } & Partial<{
 }>
 
 export class GameInfoUpdated extends DomainEvent {
-    constructor(public readonly data: Partial<UpdateGameInfoSchema> & { id: GameId }) {
+    constructor(public readonly data: Partial<GameInfoUpdatedSchema> & { id: GameId }) {
         super('game-info-updated', new Date())
     }
 }
