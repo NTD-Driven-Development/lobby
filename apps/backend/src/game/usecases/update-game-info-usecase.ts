@@ -1,12 +1,18 @@
-import { UpdateGameInfoSchema, UseCase } from '@packages/domain'
+import { UpdateGameInfoCommandSchema, UseCase } from '@packages/domain'
 import { GameRepository } from '../repository/game-repository'
 import { EventBus } from '~/eventbus/eventbus'
+import { autoInjectable, inject } from 'tsyringe'
+import { WebSocketEventBus } from '~/eventbus/websocket-eventbus'
+import { GameRepositoryImpl } from '../repository/game-repository-impl'
 
-export type UpdateGameInfoInput = UpdateGameInfoSchema
+export type UpdateGameInfoInput = UpdateGameInfoCommandSchema
 
+@autoInjectable()
 export class UpdateGameInfoUseCase implements UseCase<UpdateGameInfoInput, void> {
     constructor(
+        @inject(GameRepositoryImpl)
         private gameRepository: GameRepository,
+        @inject(WebSocketEventBus)
         private eventBus: EventBus,
     ) {
         this.gameRepository = gameRepository

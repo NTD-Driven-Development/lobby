@@ -1,7 +1,10 @@
 import fastify from 'fastify'
 import socketIO from 'fastify-socket.io'
-import { Server, Socket } from 'socket.io'
-import { UserRoutes, RoomRoutes, GameRoutes } from '~/routes'
+import { GameEventHandlers } from './routes'
+import { Server } from '@packages/socket'
+import { Socket } from 'socket.io'
+import { container } from 'tsyringe'
+// import { UserRoutes, RoomRoutes, GameRoutes } from '~/routes'
 
 const app = fastify()
 
@@ -9,20 +12,21 @@ const app = fastify()
 app.get('/api/health', (_, res) => res.send('ok'))
 
 // prefix api
-app.register(RoomRoutes, { prefix: '/api/rooms' })
-app.register(GameRoutes, { prefix: '/api/games' })
-app.register(UserRoutes, { prefix: '/api/users' })
+// app.register(RoomRoutes, { prefix: '/api/rooms' })
+// app.register(GameRoutes, { prefix: '/api/games' })
+// app.register(UserRoutes, { prefix: '/api/users' })
 
 // socket.io
 app.register(socketIO, { cors: { origin: '*' } })
 app.ready((err) => {
     if (err) throw err
-    app.io.on('connection', (socket: Socket) => {
+    app.io.on('connection', (socket: Server) => {
+        container.registerInstance(Socket, socket)
+
         console.info('Socket connected!', socket.id)
-        socket.on('ping', (data: { msg: string }) => {
-            console.info('Socket received:', data.msg)
-            socket.emit('pong', { msg: 'pong!' })
-        })
+
+        GameEventHandlers(socket)
+
         socket.on('disconnect', () => console.info('Socket disconnected!', socket.id))
     })
 
@@ -46,6 +50,6 @@ app.listen(
 
 declare module 'fastify' {
     interface FastifyInstance {
-        io: Server<{ hello: string }>
+        io: Socket
     }
 }

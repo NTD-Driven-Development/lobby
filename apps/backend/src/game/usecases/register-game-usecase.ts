@@ -1,21 +1,18 @@
-import { Game, GameStatus, UseCase } from '@packages/domain'
+import { Game, RegisterGameCommandSchema, UseCase } from '@packages/domain'
 import { GameRepository } from '../repository/game-repository'
 import { EventBus } from '~/eventbus/eventbus'
+import { autoInjectable, inject } from 'tsyringe'
+import { WebSocketEventBus } from '~/eventbus/websocket-eventbus'
+import { GameRepositoryImpl } from '../repository/game-repository-impl'
 
-export type RegisterGameInput = {
-    name: string
-    description: string
-    rule: string
-    minPlayers: number
-    maxPlayers: number
-    imageUrl: string
-    frontendUrl: string
-    backendUrl: string
-}
+export type RegisterGameInput = RegisterGameCommandSchema
 
+@autoInjectable()
 export class RegisterGameUseCase implements UseCase<RegisterGameInput, void> {
     constructor(
+        @inject(GameRepositoryImpl)
         private gameRepository: GameRepository,
+        @inject(WebSocketEventBus)
         private eventBus: EventBus,
     ) {
         this.gameRepository = gameRepository
@@ -23,21 +20,10 @@ export class RegisterGameUseCase implements UseCase<RegisterGameInput, void> {
     }
 
     async execute(input: RegisterGameInput): Promise<void> {
-        const game = new Game(
-            'test',
-            input.name,
-            input.description,
-            input.rule,
-            input.minPlayers,
-            input.maxPlayers,
-            input.imageUrl,
-            input.frontendUrl,
-            input.backendUrl,
-            GameStatus.OFFLINE,
-            new Date(),
-        )
-        const events = game.getDomainEvents()
+        const game = new Game('test')
+        game.register(input)
         await this.gameRepository.save(game)
+        const events = game.getDomainEvents()
         this.eventBus.broadcast(events)
     }
 }

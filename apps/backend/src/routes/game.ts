@@ -1,11 +1,21 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Server } from '@packages/socket'
 import 'reflect-metadata'
-import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import { container } from 'tsyringe'
 import { GameController } from '~/game/adapter/game-controller'
 
-export const GameRoutes = (fastify: FastifyInstance, opts: FastifyPluginOptions, done: () => void) => {
+// import { FastifyInstance, FastifyPluginOptions } from 'fastify'
+// export const GameRoutes = (fastify: FastifyInstance, opts: FastifyPluginOptions, done: () => void) => {
+// const gameController = container.resolve(GameController)
+// fastify.get('/', gameController.getGames)
+// done()
+// }
+
+export const GameEventHandlers = (socket: Server) => {
     const gameController = container.resolve(GameController)
-    fastify.get('/', gameController.getGames)
-    done()
+    socket.on('register-game', async (event) => {
+        await gameController.registerGame(event)
+    })
+    socket.on('update-game-info', async (event) => {
+        await gameController.updateGameInfo(event)
+    })
 }

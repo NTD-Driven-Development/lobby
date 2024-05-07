@@ -1,42 +1,56 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AggregateRoot, DomainEvent } from '../../../core'
-import { UpdateGameInfoCommandSchema } from '../command'
+import { RegisterGameCommandSchema, UpdateGameInfoCommandSchema } from '../command'
 import { GameInfoUpdated, GameRegistered } from '../events'
 
 export type GameId = string
 
 export class Game extends AggregateRoot<GameId> {
     constructor(
-        public readonly id: GameId,
-        public name: string,
-        public description: string,
-        public rule: string,
-        public minPlayers: number,
-        public maxPlayers: number,
-        public imageUrl: string,
-        public frontendUrl: string,
-        public backendUrl: string,
+        id: GameId,
+        name?: string,
+        description?: string,
+        rule?: string,
+        minPlayers?: number,
+        maxPlayers?: number,
+        imageUrl?: string | null,
+        frontendUrl?: string,
+        backendUrl?: string,
+        status?: GameStatus,
+        createdAt?: Date,
+    )
+    constructor(domainEvents: DomainEvent[])
+    constructor(
+        public readonly id: any,
+        public name?: string,
+        public description?: string,
+        public rule?: string,
+        public minPlayers?: number,
+        public maxPlayers?: number,
+        public imageUrl?: string | null,
+        public frontendUrl?: string,
+        public backendUrl?: string,
         public status: GameStatus = GameStatus.OFFLINE,
-        public createdAt: Date,
+        public createdAt: Date = new Date(),
     ) {
-        if (typeof id === 'object') {
-            super(id)
-        } else {
-            super(id)
-            this.apply(
-                new GameRegistered({
-                    id,
-                    name,
-                    description,
-                    rule,
-                    minPlayers,
-                    maxPlayers,
-                    imageUrl,
-                    frontendUrl,
-                    backendUrl,
-                    status,
-                }),
-            )
-        }
+        super(id)
+    }
+
+    public register(data: RegisterGameCommandSchema): void {
+        this.apply(
+            new GameRegistered({
+                id: this.id,
+                name: data.name,
+                description: data.description,
+                rule: data.rule,
+                minPlayers: data.minPlayers,
+                maxPlayers: data.maxPlayers,
+                imageUrl: data.imageUrl,
+                frontendUrl: data.frontendUrl,
+                backendUrl: data.backendUrl,
+                status: GameStatus.OFFLINE,
+            }),
+        )
     }
 
     public updateInfo(data: UpdateGameInfoCommandSchema): void {

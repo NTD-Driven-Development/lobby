@@ -9,7 +9,7 @@ export type GameRegisteredSchema = {
     rule: string
     minPlayers: number
     maxPlayers: number
-    imageUrl: string
+    imageUrl: string | null
     frontendUrl: string
     backendUrl: string
     status: GameStatus

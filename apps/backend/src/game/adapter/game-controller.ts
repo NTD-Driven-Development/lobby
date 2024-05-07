@@ -1,10 +1,25 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { FastifyReply, FastifyRequest } from 'fastify'
-import { autoInjectable } from 'tsyringe'
+import { singleton } from 'tsyringe'
+import { RegisterGameUseCase } from '../usecases/register-game-usecase'
+import { UpdateGameInfoUseCase } from '../usecases/update-game-info-usecase'
+import { RegisterGameEventSchema, UpdateGameInfoEventSchema } from '@packages/domain'
 
-@autoInjectable()
+@singleton()
 export class GameController {
-    public async getGames(request: FastifyRequest, reply: FastifyReply) {
-        return 'Hello World!'
+    constructor(
+        private registerGameUseCase: RegisterGameUseCase,
+        private updateGameInfoUseCase: UpdateGameInfoUseCase,
+    ) {
+        this.registerGameUseCase = registerGameUseCase
+        this.updateGameInfoUseCase = updateGameInfoUseCase
+    }
+
+    public async registerGame(event: RegisterGameEventSchema) {
+        console.log('register-game', event)
+        await this.registerGameUseCase.execute(event.data)
+    }
+
+    public async updateGameInfo(event: UpdateGameInfoEventSchema) {
+        console.log('update-game-info', event)
+        await this.updateGameInfoUseCase.execute(event.data)
     }
 }
