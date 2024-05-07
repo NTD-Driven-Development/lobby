@@ -46,7 +46,7 @@ export class Room extends AggregateRoot<RoomId> {
             super(id)
             this.apply(
                 new RoomCreated({
-                    id,
+                    roomId: id,
                     name,
                     game,
                     host,
@@ -137,12 +137,12 @@ export class Room extends AggregateRoot<RoomId> {
 
     public changeHost(payload: ChangeHostCommandSchema) {
         this.validateHost(payload.playerId)
-        this.apply(new RoomChangedHost({ id: this.id, host: payload.playerId }))
+        this.apply(new RoomChangedHost({ roomId: this.id, host: payload.playerId }))
     }
 
     public closeRoom(payload: CloseRoomCommandSchema) {
         this.validateHost(payload.playerId)
-        this.apply(new RoomClosed({ id: this.id, isClosed: true }))
+        this.apply(new RoomClosed({ roomId: this.id, isClosed: true }))
     }
 
     public joinRoom(player: PlayerJoinRoomCommandSchema) {
@@ -168,10 +168,10 @@ export class Room extends AggregateRoot<RoomId> {
         }
         this.apply(new PlayerLeftRoom({ roomId: this.id, userId: player.id }))
         if (this.host.id === player.id) {
-            this.apply(new RoomChangedHost({ id: this.id, host: this.players[0]?.id }))
+            this.apply(new RoomChangedHost({ roomId: this.id, host: this.players[0]?.id }))
         }
         if (this.players.length === 0) {
-            this.apply(new RoomClosed({ id: this.id, isClosed: true }))
+            this.apply(new RoomClosed({ roomId: this.id, isClosed: true }))
         }
     }
 
@@ -214,7 +214,7 @@ export class Room extends AggregateRoot<RoomId> {
         }
         this.apply(
             new RoomStartedGame({
-                id: this.id,
+                roomId: this.id,
                 gameUrl: payload.gameUrl,
                 status: RoomStatus.PLAYING,
             }),
@@ -225,7 +225,9 @@ export class Room extends AggregateRoot<RoomId> {
         if (this.status === RoomStatus.WAITING) {
             throw new Error('The game has not started yet')
         }
-        this.apply(new RoomEndedGame({ id: this.id, status: RoomStatus.WAITING, gameUrl: null }))
+        this.apply(
+            new RoomEndedGame({ roomId: this.id, status: RoomStatus.WAITING, gameUrl: null }),
+        )
     }
 
     private cancelReadyExceptHost() {

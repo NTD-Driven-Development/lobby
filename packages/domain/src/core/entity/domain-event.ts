@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 export abstract class DomainEvent {
     private readonly id: string
     private readonly occurredOn: Date
-    protected readonly type: string
+    public readonly type: string
 
     constructor(type: string, occurredOn: Date) {
         this.id = uuidv4()
