@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import 'reflect-metadata'
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import { container } from 'tsyringe'
 import { UserController } from '~/user/adapter/user-controller'

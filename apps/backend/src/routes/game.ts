@@ -1,5 +1,4 @@
 import { Server } from '@packages/socket'
-import 'reflect-metadata'
 import { container } from 'tsyringe'
 import { GameController } from '~/game/adapter/game-controller'
 

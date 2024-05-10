@@ -1,12 +1,14 @@
-import { singleton } from 'tsyringe'
-import { RegisterGameUseCase } from '../usecases/register-game-usecase'
-import { UpdateGameInfoUseCase } from '../usecases/update-game-info-usecase'
+import { autoInjectable, inject } from 'tsyringe'
+import { RegisterGameUseCase } from '~/game/usecases/register-game-usecase'
+import { UpdateGameInfoUseCase } from '~/game/usecases/update-game-info-usecase'
 import { RegisterGameEventSchema, UpdateGameInfoEventSchema } from '@packages/domain'
 
-@singleton()
+@autoInjectable()
 export class GameController {
     constructor(
+        @inject(RegisterGameUseCase)
         private registerGameUseCase: RegisterGameUseCase,
+        @inject(UpdateGameInfoUseCase)
         private updateGameInfoUseCase: UpdateGameInfoUseCase,
     ) {
         this.registerGameUseCase = registerGameUseCase

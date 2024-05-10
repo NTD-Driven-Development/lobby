@@ -1,3 +1,4 @@
+import 'reflect-metadata'
 import fastify from 'fastify'
 import socketIO from 'fastify-socket.io'
 import { GameEventHandlers } from './routes'
@@ -36,7 +37,7 @@ app.ready((err) => {
 // start server
 app.listen(
     {
-        port: 3000,
+        port: Number(process.env.NODE_PORT) || 3000,
         host: '0.0.0.0',
     },
     (err, address) => {
