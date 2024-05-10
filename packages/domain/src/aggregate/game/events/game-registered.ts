@@ -24,6 +24,6 @@ export class GameRegistered extends DomainEvent {
 export type GameRegisteredEventSchema = GameRegistered
 
 export type RegisterGameEventSchema = {
-    type: 'register-game-info'
+    type: 'register-game'
     data: RegisterGameCommandSchema
 }
