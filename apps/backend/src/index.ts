@@ -1,10 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import 'reflect-metadata'
 import fastify from 'fastify'
 import socketIO from 'fastify-socket.io'
-import { GameEventHandlers } from './routes'
+import { GameEventHandlers } from '~/routes'
 import { Server } from '@packages/socket'
 import { Socket } from 'socket.io'
 import { container } from 'tsyringe'
+import { auth0Middleware } from '~/middleware/socket-auth0'
+
 // import { UserRoutes, RoomRoutes, GameRoutes } from '~/routes'
 
 const app = fastify()
@@ -19,8 +22,12 @@ app.get('/api/health', (_, res) => res.send('ok'))
 
 // socket.io
 app.register(socketIO, { cors: { origin: '*' } })
-app.ready((err) => {
+app.ready(async (err) => {
     if (err) throw err
+
+    if (process.env.NODE_ENV !== 'test' && process.env.NODE_ENV !== 'ci') {
+        app.io.use(auth0Middleware() as any)
+    }
     app.io.on('connection', (socket: Server) => {
         container.registerInstance(Socket, socket)
 
