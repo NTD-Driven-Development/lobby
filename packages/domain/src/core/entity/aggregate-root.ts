@@ -5,6 +5,7 @@ import { Entity } from './entity'
 export abstract class AggregateRoot<ID> implements Entity<ID> {
     private domainEvents: DomainEvent[] = []
     protected id: ID
+    protected version: number = 1
     constructor(id: ID)
     constructor(events: DomainEvent[])
     constructor(id?: any) {
@@ -35,6 +36,10 @@ export abstract class AggregateRoot<ID> implements Entity<ID> {
         this.domainEvents = []
     }
 
+    public getVersion(): number {
+        return this.version
+    }
+
     protected abstract when(event: DomainEvent): void
 
     protected ensureInvariant(): void {}
@@ -43,6 +48,8 @@ export abstract class AggregateRoot<ID> implements Entity<ID> {
         this.ensureInvariant()
 
         this.when(event)
+
+        this.version++
 
         this.ensureInvariant()
 

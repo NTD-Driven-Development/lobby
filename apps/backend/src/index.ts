@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import dotenv from 'dotenv'
+dotenv.config({ path: `.env.${process.env.NODE_ENV}` })
 import 'reflect-metadata'
 import fastify from 'fastify'
 import socketIO from 'fastify-socket.io'
@@ -45,7 +47,7 @@ app.ready(async (err) => {
 app.listen(
     {
         port: Number(process.env.NODE_PORT) || 3000,
-        host: '0.0.0.0',
+        host: process.env.NODE_HOST || '0.0.0.0',
     },
     (err, address) => {
         if (err) {

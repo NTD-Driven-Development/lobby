@@ -1,8 +1,16 @@
-import { GameStatus, RegisterGameEventSchema, UpdateGameInfoEventSchema } from '@packages/domain'
+import {
+    GameInfoUpdatedEventSchema,
+    GameRegisteredEventSchema,
+    GameStatus,
+    RegisterGameEventSchema,
+    UpdateGameInfoEventSchema,
+} from '@packages/domain'
 import { Client } from '@packages/socket'
 import io from 'socket.io-client'
+import { AppDataSource } from '~/data/data-source'
 
 let client: Client
+let aggregateId: string
 
 describe('socket on game-controller', () => {
     beforeEach((done: jest.DoneCallback) => {
@@ -14,7 +22,11 @@ describe('socket on game-controller', () => {
             forceNew: true,
             transports: ['websocket'],
         })
-        done()
+        client.on('connect', () => {
+            AppDataSource.connect().then(() => {
+                done()
+            })
+        })
     })
 
     /**
@@ -24,6 +36,7 @@ describe('socket on game-controller', () => {
         // Cleanup
         if (client.connected) {
             client.disconnect()
+            AppDataSource.close()
         }
     })
 
@@ -31,7 +44,7 @@ describe('socket on game-controller', () => {
         // Emit sth from Client do Server
         client.on('game-registered', (event) => {
             expect(event.data).toEqual(
-                expect.objectContaining({
+                expect.objectContaining<GameRegisteredEventSchema['data']>({
                     id: expect.any(String),
                     name: 'test',
                     description: 'test',
@@ -44,6 +57,7 @@ describe('socket on game-controller', () => {
                     status: GameStatus.OFFLINE,
                 }),
             )
+            aggregateId = event.data.id
             done()
         })
         client.emit('register-game', {
@@ -65,7 +79,7 @@ describe('socket on game-controller', () => {
         // Emit sth from Client do Server
         client.on('game-info-updated', (event) => {
             expect(event.data).toEqual(
-                expect.objectContaining({
+                expect.objectContaining<GameInfoUpdatedEventSchema['data']>({
                     id: expect.any(String),
                     name: 'test-updated',
                     status: GameStatus.OFFLINE,
@@ -76,7 +90,7 @@ describe('socket on game-controller', () => {
         client.emit('update-game-info', {
             type: 'update-game-info',
             data: {
-                id: 'test',
+                id: aggregateId,
                 name: 'test-updated',
             },
         } as UpdateGameInfoEventSchema)

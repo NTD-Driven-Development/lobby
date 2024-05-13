@@ -1,9 +1,10 @@
 import { Game, RegisterGameCommandSchema, UseCase } from '@packages/domain'
-import { GameRepository } from '../repository/game-repository'
+import { GameRepository } from '~/game/repository/game-repository'
 import { EventBus } from '~/eventbus/eventbus'
 import { autoInjectable, inject } from 'tsyringe'
 import { WebSocketEventBus } from '~/eventbus/websocket-eventbus'
-import { GameRepositoryImpl } from '../repository/game-repository-impl'
+import { GameRepositoryImpl } from '~/game/repository/game-repository-impl'
+import { v4 } from 'node-uuid'
 
 export type RegisterGameInput = RegisterGameCommandSchema
 
@@ -20,7 +21,7 @@ export class RegisterGameUseCase implements UseCase<RegisterGameInput, void> {
     }
 
     async execute(input: RegisterGameInput): Promise<void> {
-        const game = new Game('test')
+        const game = new Game(v4())
         game.register(input)
         await this.gameRepository.save(game)
         const events = game.getDomainEvents()

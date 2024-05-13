@@ -16,6 +16,7 @@ export class Game extends AggregateRoot<GameId> {
         imageUrl?: string | null,
         frontendUrl?: string,
         backendUrl?: string,
+        version?: number,
         status?: GameStatus,
         createdAt?: Date,
     )
@@ -30,6 +31,7 @@ export class Game extends AggregateRoot<GameId> {
         public imageUrl?: string | null,
         public frontendUrl?: string,
         public backendUrl?: string,
+        protected version: number = 1,
         public status: GameStatus = GameStatus.OFFLINE,
         public createdAt: Date = new Date(),
     ) {
