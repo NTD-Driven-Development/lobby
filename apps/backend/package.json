@@ -5,7 +5,7 @@
     "main": "src/index.ts",
     "scripts": {
         "rebuild": "rm -rf ./dist && npm run build",
-        "build": "cross-env NODE_ENV=production --bundle --platform=node --target=node18 --outdir=dist src/index.ts",
+        "build": "cross-env NODE_ENV=production esbuild --bundle --platform=node --target=node18 --outdir=dist src/index.ts",
         "start": "node dist/index",
         "dev": "cross-env NODE_ENV=development ts-node-dev -r tsconfig-paths/register --project .  --respawn src/index.ts",
         "format": "prettier --no-error-on-unmatched-pattern --write \"src/**/*.ts\" \"test/**/*.ts\"",

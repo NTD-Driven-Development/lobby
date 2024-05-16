@@ -46,7 +46,7 @@ app.ready(async (err) => {
 // start server
 app.listen(
     {
-        port: Number(process.env.NODE_PORT) || 3000,
+        port: Number(process.env.NODE_PORT) || 3001,
         host: process.env.NODE_HOST || '0.0.0.0',
     },
     (err, address) => {

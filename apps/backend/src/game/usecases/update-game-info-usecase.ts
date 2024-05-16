@@ -20,9 +20,13 @@ export class UpdateGameInfoUseCase implements UseCase<UpdateGameInfoInput, void>
     }
 
     async execute(input: UpdateGameInfoInput): Promise<void> {
+        // 查
         const game = await this.gameRepository.findById(input.id)
+        // 改
         game.updateInfo(input)
+        // 存
         await this.gameRepository.save(game)
+        // 推
         const events = game.getDomainEvents()
         this.eventBus.broadcast(events)
     }
