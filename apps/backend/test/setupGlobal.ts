@@ -15,5 +15,5 @@ export default async function (globalConfig: Config.GlobalConfig, projectConfig:
     }
     console.log('setup test server')
     process.env.NODE_PORT = '8002'
-    require('../src/index')
+    await require('../src/index')
 }

@@ -13,6 +13,18 @@ let client: Client
 let aggregateId: string
 
 describe('socket on game-controller', () => {
+    beforeAll((done) => {
+        AppDataSource.connect().then(async () => {
+            console.log('Database connected')
+            const entities = AppDataSource.entityMetadatas
+            for (const entity of entities) {
+                const repository = AppDataSource.getRepository(entity.name)
+                await repository.clear()
+            }
+            AppDataSource.close()
+            done()
+        })
+    })
     beforeEach((done: jest.DoneCallback) => {
         // Setup
         // Do not hardcode server port and address, square brackets are used for IPv6
@@ -43,34 +55,36 @@ describe('socket on game-controller', () => {
     it('should be get game-registered event', (done) => {
         // Emit sth from Client do Server
         client.on('game-registered', (event) => {
+            // then
             expect(event.data).toEqual(
                 expect.objectContaining<GameRegisteredEventSchema['data']>({
                     id: expect.any(String),
-                    name: 'test',
-                    description: 'test',
-                    rule: 'test',
-                    minPlayers: 1,
-                    maxPlayers: 1,
+                    name: 'Big Two',
+                    description: '待議',
+                    rule: '待議',
+                    minPlayers: 4,
+                    maxPlayers: 4,
                     imageUrl: null,
-                    frontendUrl: 'test',
-                    backendUrl: 'test',
+                    frontendUrl: 'http://localhost:3000',
+                    backendUrl: 'http://localhost:8000/api',
                     status: GameStatus.OFFLINE,
                 }),
             )
             aggregateId = event.data.id
             done()
         })
+        // when
         client.emit('register-game', {
             type: 'register-game',
             data: {
-                name: 'test',
-                description: 'test',
-                rule: 'test',
-                minPlayers: 1,
-                maxPlayers: 1,
+                name: 'Big Two',
+                description: '待議',
+                rule: '待議',
+                minPlayers: 4,
+                maxPlayers: 4,
                 imageUrl: null,
-                frontendUrl: 'test',
-                backendUrl: 'test',
+                frontendUrl: 'http://localhost:3000',
+                backendUrl: 'http://localhost:8000/api',
             },
         } as RegisterGameEventSchema)
     })
@@ -78,6 +92,7 @@ describe('socket on game-controller', () => {
     it('should be get game-info-updated event', (done) => {
         // Emit sth from Client do Server
         client.on('game-info-updated', (event) => {
+            // then
             expect(event.data).toEqual(
                 expect.objectContaining<GameInfoUpdatedEventSchema['data']>({
                     id: expect.any(String),
@@ -87,6 +102,7 @@ describe('socket on game-controller', () => {
             )
             done()
         })
+        // when
         client.emit('update-game-info', {
             type: 'update-game-info',
             data: {
