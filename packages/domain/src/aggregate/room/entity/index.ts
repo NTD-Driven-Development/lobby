@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AggregateRoot, DomainEvent } from '../../../core'
 import {
     PlayerJoinedRoom,
@@ -24,43 +25,43 @@ export type PlayerId = string
 
 export class Room extends AggregateRoot<RoomId> {
     constructor(
-        public readonly id: RoomId,
-        public name: string,
+        id: RoomId,
+        name: string,
+        game: {
+            id: string
+            name: string
+            minPlayers: number
+            maxPlayers: number
+        },
+        host: Player,
+        players: Player[],
+        minPlayers: number,
+        maxPlayers: number,
+        createdAt: Date,
+        status?: RoomStatus,
+        password?: string | null,
+        isClosed?: boolean,
+        gameUrl?: string | null,
+    )
+    constructor(domainEvents: DomainEvent[])
+    constructor(
+        public readonly id: any,
+        public name: string = '',
         public game: {
             id: string
             name: string
-        },
-        public host: Player,
-        public players: Player[],
-        public minPlayers: number,
-        public maxPlayers: number,
+        } = undefined as any,
+        public host: Player = undefined as any,
+        public players: Player[] = [],
+        public minPlayers: number = 0,
+        public maxPlayers: number = 0,
         public createdAt: Date = new Date(),
         public status: RoomStatus = RoomStatus.WAITING,
         public password: string | null = null,
         public isClosed: boolean = false,
         public gameUrl: string | null = null,
     ) {
-        if (typeof id === 'object') {
-            super(id)
-        } else {
-            super(id)
-            this.apply(
-                new RoomCreated({
-                    roomId: id,
-                    name,
-                    game,
-                    host,
-                    currentPlayers: players,
-                    minPlayers,
-                    maxPlayers,
-                    password,
-                    status,
-                    isClosed,
-                    gameUrl,
-                    createdAt,
-                }),
-            )
-        }
+        super(id)
     }
 
     protected when(event: DomainEvent): void {
@@ -125,6 +126,43 @@ export class Room extends AggregateRoot<RoomId> {
 
     isLocked() {
         return this.password !== null
+    }
+
+    public createRoom(payload: {
+        name: string
+        game: {
+            id: string
+            name: string
+            minPlayers: number
+            maxPlayers: number
+        }
+        host: Player
+        minPlayers: number
+        maxPlayers: number
+        password: string | null
+    }) {
+        if (
+            payload.minPlayers < payload.game.minPlayers ||
+            payload.maxPlayers > payload.game.maxPlayers
+        ) {
+            throw new Error('Invalid number of players')
+        }
+        this.apply(
+            new RoomCreated({
+                roomId: this.id,
+                name: payload.name,
+                game: payload.game,
+                host: payload.host,
+                currentPlayers: [payload.host],
+                minPlayers: payload.minPlayers,
+                maxPlayers: payload.maxPlayers,
+                password: payload.password,
+                status: RoomStatus.WAITING,
+                isClosed: false,
+                gameUrl: null,
+                createdAt: new Date(),
+            }),
+        )
     }
 
     private addPlayer(player: Player) {
@@ -250,13 +288,15 @@ export enum RoomStatus {
     PLAYING = 'PLAYING',
 }
 
-export class Player {
-    constructor(
-        public readonly id: PlayerId,
-        public readonly name: string,
-        public isReady: boolean = false,
-    ) {
-        this.id = id
-        this.name = name
-    }
+export type Game = {
+    id: string
+    name: string
+    minPlayers: number
+    maxPlayers: number
+}
+
+export type Player = {
+    id: Readonly<PlayerId>
+    name: Readonly<string>
+    isReady: boolean
 }

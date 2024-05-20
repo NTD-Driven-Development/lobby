@@ -2,11 +2,10 @@ import { UserId } from '../entity'
 import { DomainEvent } from '../../../core/entity'
 import { UpdateUserInfoCommandSchema } from '../command'
 
-export type UserInfoUpdatedSchema = {
-    id: UserId
+export type UserInfoUpdatedSchema = { id: UserId } & Partial<{
     name: string
     identities: string[]
-}
+}>
 
 export class UserInfoUpdated extends DomainEvent {
     constructor(public readonly data: UserInfoUpdatedSchema) {

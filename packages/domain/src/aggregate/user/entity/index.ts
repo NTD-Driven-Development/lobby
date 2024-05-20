@@ -1,25 +1,27 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AggregateRoot, DomainEvent } from '../../../core'
 import { UserInfoUpdated, UserRegistered } from '../events'
 
 export type UserId = string
 
 export class User extends AggregateRoot<UserId> {
+    constructor(id: UserId, email: string, name: string, identities: string[])
+    constructor(domainEvents: DomainEvent[])
     constructor(
-        public readonly id: UserId,
-        public email: string,
-        public name: string,
+        public readonly id: any,
+        public email: string = undefined as any,
+        public name: string = undefined as any,
         public identities: string[] = [],
     ) {
-        if (typeof id === 'object') {
-            super(id)
-        } else {
-            super(id)
-            this.apply(new UserRegistered({ id, email, name, identities }))
-        }
+        super(id)
+    }
+
+    public register(payload: { email: string; name: string; identities: string[] }) {
+        this.apply(new UserRegistered({ id: this.id, ...payload }))
     }
 
     public changeName(name: string) {
-        this.apply(new UserInfoUpdated({ id: this.id, name, identities: this.identities }))
+        this.apply(new UserInfoUpdated({ id: this.id, name }))
     }
 
     public addIdentity(identity: string) {
