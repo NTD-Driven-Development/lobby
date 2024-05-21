@@ -1,4 +1,4 @@
-import { Player, RoomId, RoomStatus } from '../entity'
+import { Player, RoomGameSchema, RoomId, RoomStatus } from '../entity'
 import { DomainEvent } from '../../../core/entity/domain-event'
 import { CreateRoomCommandSchema } from '../command'
 import { RoomEvent } from './room-event'
@@ -6,10 +6,7 @@ import { RoomEvent } from './room-event'
 export type RoomCreatedSchema = {
     roomId: RoomId
     name: string
-    game: {
-        id: string
-        name: string
-    }
+    game: RoomGameSchema
     host: Player
     currentPlayers: Player[]
     minPlayers: number

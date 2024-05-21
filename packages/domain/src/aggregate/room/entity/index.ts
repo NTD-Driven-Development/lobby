@@ -18,21 +18,19 @@ import {
     CloseRoomCommandSchema,
     StartGameCommandSchema,
 } from '../command'
+import { Game } from '../../game'
 
 export type RoomId = string
 
 export type PlayerId = string
 
+export type RoomGameSchema = Required<Pick<Game, 'id' | 'name' | 'minPlayers' | 'maxPlayers'>>
+
 export class Room extends AggregateRoot<RoomId> {
     constructor(
         id: RoomId,
         name: string,
-        game: {
-            id: string
-            name: string
-            minPlayers: number
-            maxPlayers: number
-        },
+        game: RoomGameSchema,
         host: Player,
         players: Player[],
         minPlayers: number,
@@ -47,10 +45,7 @@ export class Room extends AggregateRoot<RoomId> {
     constructor(
         public readonly id: any,
         public name: string = '',
-        public game: {
-            id: string
-            name: string
-        } = undefined as any,
+        public game: RoomGameSchema = undefined as any,
         public host: Player = undefined as any,
         public players: Player[] = [],
         public minPlayers: number = 0,
@@ -286,13 +281,6 @@ export class Room extends AggregateRoot<RoomId> {
 export enum RoomStatus {
     WAITING = 'WAITING',
     PLAYING = 'PLAYING',
-}
-
-export type Game = {
-    id: string
-    name: string
-    minPlayers: number
-    maxPlayers: number
 }
 
 export type Player = {
