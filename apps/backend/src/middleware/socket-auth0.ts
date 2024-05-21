@@ -32,7 +32,11 @@ const auth0Middleware: SocketIOMiddlewareFactory = (domainParam?: string, audien
     }
 
     return async function (socket, next) {
-        const { token: authHandshakeToken } = socket.handshake.query
+        const { token: queryToken } = socket.handshake.query
+        const headerToken = socket.handshake.headers.authorization
+        const { token: authToken } = socket.handshake.auth
+        const authHandshakeToken = queryToken ?? headerToken ?? authToken
+
         if (typeof authHandshakeToken !== 'string') {
             return next(
                 new Error(
