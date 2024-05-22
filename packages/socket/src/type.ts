@@ -1,16 +1,4 @@
 import {
-    GameInfoUpdated,
-    GameRegistered,
-    PlayerJoinedRoom,
-    PlayerLeftRoom,
-    PlayerReadinessChanged,
-    RoomChangedHost,
-    RoomClosed,
-    RoomCreated,
-    RoomEndedGame,
-    RoomStartedGame,
-    UserInfoUpdated,
-    UserRegistered,
     UpdateGameInfoEventSchema,
     RegisterGameEventSchema,
     PlayerJoinRoomEventSchema,
@@ -23,26 +11,42 @@ import {
     StartGameEventSchema,
     UpdateUserInfoEventSchema,
     RegisterUserEventSchema,
+    GetGamesEventSchema,
+    GetGamesResultEventSchema,
+    GameInfoUpdatedEventSchema,
+    GameRegisteredEventSchema,
+    PlayerJoinedRoomEventSchema,
+    PlayerLeftRoomEventSchema,
+    PlayerReadinessChangedEventSchema,
+    RoomChangedHostEventSchema,
+    RoomClosedEventSchema,
+    RoomCreatedEventSchema,
+    RoomEndedGameEventSchema,
+    RoomStartedGameEventSchema,
+    UserInfoUpdatedEventSchema,
+    UserRegisteredEventSchema,
 } from '@packages/domain'
 import { Socket as BaseServer } from 'socket.io'
 import { Socket as BaseClient } from 'socket.io-client'
 
 interface ServerToClientEvents {
-    'game-info-updated': (event: GameInfoUpdated) => void
-    'game-registered': (event: GameRegistered) => void
-    'player-joined-room': (event: PlayerJoinedRoom) => void
-    'player-left-room': (event: PlayerLeftRoom) => void
-    'player-readiness-changed': (event: PlayerReadinessChanged) => void
-    'room-changed-host': (event: RoomChangedHost) => void
-    'room-closed': (event: RoomClosed) => void
-    'room-created': (event: RoomCreated) => void
-    'room-ended-game': (event: RoomEndedGame) => void
-    'room-started-game': (event: RoomStartedGame) => void
-    'user-info-updated': (event: UserInfoUpdated) => void
-    'user-registered': (event: UserRegistered) => void
+    'get-games-result': (event: GetGamesResultEventSchema) => void
+    'game-info-updated': (event: GameInfoUpdatedEventSchema) => void
+    'game-registered': (event: GameRegisteredEventSchema) => void
+    'player-joined-room': (event: PlayerJoinedRoomEventSchema) => void
+    'player-left-room': (event: PlayerLeftRoomEventSchema) => void
+    'player-readiness-changed': (event: PlayerReadinessChangedEventSchema) => void
+    'room-changed-host': (event: RoomChangedHostEventSchema) => void
+    'room-closed': (event: RoomClosedEventSchema) => void
+    'room-created': (event: RoomCreatedEventSchema) => void
+    'room-ended-game': (event: RoomEndedGameEventSchema) => void
+    'room-started-game': (event: RoomStartedGameEventSchema) => void
+    'user-info-updated': (event: UserInfoUpdatedEventSchema) => void
+    'user-registered': (event: UserRegisteredEventSchema) => void
 }
 
 interface ClientToServerEvents {
+    'get-games': (event: GetGamesEventSchema) => void
     'update-game-info': (event: UpdateGameInfoEventSchema) => void
     'register-game': (event: RegisterGameEventSchema) => void
     'join-room': (event: PlayerJoinRoomEventSchema) => void
