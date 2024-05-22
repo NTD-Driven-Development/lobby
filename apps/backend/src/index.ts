@@ -9,52 +9,60 @@ import { Server } from '@packages/socket'
 import { Socket } from 'socket.io'
 import { container } from 'tsyringe'
 import { auth0Middleware } from '~/middleware/socket-auth0'
+import { AppDataSource } from './data/data-source'
+;(async () => {
+    try {
+        // import { UserRoutes, RoomRoutes, GameRoutes } from '~/routes'
+        const app = fastify()
 
-// import { UserRoutes, RoomRoutes, GameRoutes } from '~/routes'
+        // health check
+        app.get('/api/health', (_, res) => res.send('ok'))
 
-const app = fastify()
+        // prefix api
+        // app.register(RoomRoutes, { prefix: '/api/rooms' })
+        // app.register(GameRoutes, { prefix: '/api/games' })
+        // app.register(UserRoutes, { prefix: '/api/users' })
 
-// health check
-app.get('/api/health', (_, res) => res.send('ok'))
+        // socket.io
+        app.register(socketIO, { cors: { origin: '*' } })
+        app.ready(async (err) => {
+            if (err) throw err
 
-// prefix api
-// app.register(RoomRoutes, { prefix: '/api/rooms' })
-// app.register(GameRoutes, { prefix: '/api/games' })
-// app.register(UserRoutes, { prefix: '/api/users' })
+            app.io.use(auth0Middleware() as any)
+            app.io.on('connection', (socket: Server) => {
+                container.registerInstance(Socket, socket)
 
-// socket.io
-app.register(socketIO, { cors: { origin: '*' } })
-app.ready(async (err) => {
-    if (err) throw err
+                console.info('Socket connected!', socket.id)
 
-    app.io.use(auth0Middleware() as any)
-    app.io.on('connection', (socket: Server) => {
-        container.registerInstance(Socket, socket)
+                GameEventHandlers(socket)
 
-        console.info('Socket connected!', socket.id)
+                socket.on('disconnect', () => console.info('Socket disconnected!', socket.id))
+            })
 
-        GameEventHandlers(socket)
-
-        socket.on('disconnect', () => console.info('Socket disconnected!', socket.id))
-    })
-
-    app.io.on('error', (error) => console.error('Socket error:', error))
-})
-
-// start server
-app.listen(
-    {
-        port: Number(process.env.NODE_PORT) || 3001,
-        host: process.env.NODE_HOST || '0.0.0.0',
-    },
-    (err, address) => {
-        if (err) {
-            console.error(err)
-            process.exit(1)
+            app.io.on('error', (error) => console.error('Socket error:', error))
+        })
+        await AppDataSource.initialize()
+        if (AppDataSource.isInitialized) {
+            // start server
+            app.listen(
+                {
+                    port: Number(process.env.NODE_PORT) || 3001,
+                    host: process.env.NODE_HOST || '0.0.0.0',
+                },
+                (err, address) => {
+                    if (err) {
+                        console.error(err)
+                        process.exit(1)
+                    }
+                    console.log(`Server listening at ${address}`)
+                },
+            )
         }
-        console.log(`Server listening at ${address}`)
-    },
-)
+    } catch (err) {
+        console.error(err)
+        process.exit(1)
+    }
+})()
 
 declare module 'fastify' {
     interface FastifyInstance {

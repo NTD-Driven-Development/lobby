@@ -7,47 +7,25 @@ import {
 } from '@packages/domain'
 import { Client } from '@packages/socket'
 import io from 'socket.io-client'
-import { AppDataSource } from '~/data/data-source'
 
 let client: Client
 
 describe('socket on game-controller', () => {
-    beforeAll((done) => {
-        AppDataSource.connect().then(async () => {
-            console.log('Database connected')
-            const entities = AppDataSource.entityMetadatas
-            for (const entity of entities) {
-                const repository = AppDataSource.getRepository(entity.name)
-                await repository.clear()
-            }
-            AppDataSource.close()
-            done()
-        })
-    })
-    beforeEach((done: jest.DoneCallback) => {
+    beforeAll(() => {})
+    beforeEach(() => {
         // Setup
-        // Do not hardcode server port and address, square brackets are used for IPv6
         client = io(globalThis.SOCKET_URL, {
             reconnectionDelayMax: 0,
             reconnectionDelay: 0,
             forceNew: true,
             transports: ['websocket'],
         })
-        client.on('connect', () => {
-            AppDataSource.connect().then(() => {
-                done()
-            })
-        })
+        client.on('connect', () => {})
     })
 
-    /**
-     * Run after each test
-     */
     afterEach(() => {
-        // Cleanup
         if (client.connected) {
             client.disconnect()
-            AppDataSource.close()
         }
     })
 
