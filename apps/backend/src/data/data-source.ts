@@ -2,7 +2,7 @@ import dotenv from 'dotenv'
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` })
 import { DataSource } from 'typeorm'
 import { GameData } from '~/data/entity'
-import { ClearDatabaseFeatureToggle } from '~/feature-toggle/clear-database-feature-toggle'
+import { ClearDatabaseFeatureToggle } from '~/feature-toggle'
 
 export const AppDataSource = new DataSource({
     type: process.env.DB_TYPE as 'mariadb' | 'mongodb' | 'mysql' | 'mssql' | 'postgres',
