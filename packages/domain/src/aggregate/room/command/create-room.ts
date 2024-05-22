@@ -5,6 +5,8 @@ export type CreateRoomCommandSchema = {
     game: {
         id: string
         name: string
+        minPlayers: number
+        maxPlayers: number
     }
     host: Player
     players: Player[]
