@@ -27,9 +27,7 @@ app.register(socketIO, { cors: { origin: '*' } })
 app.ready(async (err) => {
     if (err) throw err
 
-    if (process.env.NODE_ENV !== 'test' && process.env.NODE_ENV !== 'ci') {
-        app.io.use(auth0Middleware() as any)
-    }
+    app.io.use(auth0Middleware() as any)
     app.io.on('connection', (socket: Server) => {
         container.registerInstance(Socket, socket)
 
