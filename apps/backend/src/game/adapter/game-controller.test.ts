@@ -10,7 +10,6 @@ import io from 'socket.io-client'
 import { AppDataSource } from '~/data/data-source'
 
 let client: Client
-let aggregateId: string
 
 describe('socket on game-controller', () => {
     beforeAll((done) => {
@@ -52,7 +51,14 @@ describe('socket on game-controller', () => {
         }
     })
 
-    it('should be get game-registered event', (done) => {
+    it(`
+        遊戲開發者向 Lobby 註冊一個大老二遊戲，
+        沒有圖片連結，最小人數及最大人數上限皆為 4 人，
+        規則及詳細敘述皆為「待議」，
+        前端 host='http://localhost:3000'，
+        後端 host='http://localhost:8000/api'，
+        由於平台沒有註冊過這款遊戲，所以遊戲註冊成功。
+    `, (done) => {
         // Emit sth from Client do Server
         client.on('game-registered', (event) => {
             // then
@@ -70,7 +76,6 @@ describe('socket on game-controller', () => {
                     status: GameStatus.OFFLINE,
                 }),
             )
-            aggregateId = event.data.id
             done()
         })
         // when
@@ -89,26 +94,55 @@ describe('socket on game-controller', () => {
         } as RegisterGameEventSchema)
     })
 
-    it('should be get game-info-updated event', (done) => {
-        // Emit sth from Client do Server
-        client.on('game-info-updated', (event) => {
-            // then
-            expect(event.data).toEqual(
-                expect.objectContaining<GameInfoUpdatedEventSchema['data']>({
-                    id: expect.any(String),
-                    name: 'test-updated',
-                    status: GameStatus.OFFLINE,
-                }),
-            )
-            done()
-        })
-        // when
-        client.emit('update-game-info', {
-            type: 'update-game-info',
+    it(`
+        註冊一個 Big Two blah blah 遊戲，
+        從遊戲列表中選取該筆遊戲並更新遊戲名稱為「test-updated」，
+        更新成功。
+    `, (done) => {
+        client.emit('register-game', {
+            type: 'register-game',
             data: {
-                id: aggregateId,
-                name: 'test-updated',
+                name: 'Big Two blah blah',
+                description: 'test',
+                rule: 'test',
+                minPlayers: 4,
+                maxPlayers: 4,
+                imageUrl: null,
+                frontendUrl: 'http://localhost:3000',
+                backendUrl: 'http://localhost:8000/api',
             },
-        } as UpdateGameInfoEventSchema)
+        } as RegisterGameEventSchema)
+        client.on('game-registered', (event) => {
+            const aggregateId = event.data.id
+            client.emit('get-games', {
+                type: 'get-games',
+                data: {},
+            })
+            client.on('get-games-result', (event) => {
+                // given
+                const data = event.data.find((game) => game.id === aggregateId)
+                expect(data).toBeTruthy()
+                const payload = {
+                    type: 'update-game-info',
+                    data: {
+                        id: data?.id,
+                        name: 'test-updated',
+                    },
+                } as UpdateGameInfoEventSchema
+                // when
+                client.emit('update-game-info', payload)
+                // then
+                client.on('game-info-updated', (event) => {
+                    expect(event.data).toEqual(
+                        expect.objectContaining<GameInfoUpdatedEventSchema['data']>({
+                            id: expect.any(String),
+                            name: 'test-updated',
+                            status: GameStatus.OFFLINE,
+                        }),
+                    )
+                    done()
+                })
+            })
+        })
     })
 })

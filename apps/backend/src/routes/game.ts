@@ -17,4 +17,7 @@ export const GameEventHandlers = (socket: Server) => {
     socket.on('update-game-info', async (event) => {
         await gameController.updateGameInfo(event)
     })
+    socket.on('get-games', async (event) => {
+        socket.emit('get-games-result', await gameController.getGames(event))
+    })
 }
