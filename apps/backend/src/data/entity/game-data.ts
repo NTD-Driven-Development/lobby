@@ -2,7 +2,7 @@ import { Entity, Column, BaseEntity, PrimaryColumn } from 'typeorm'
 
 @Entity('game')
 export class GameData extends BaseEntity {
-    @PrimaryColumn('uuid')
+    @PrimaryColumn({ type: 'uuid', name: 'id' })
     id!: string
 
     @Column({ type: 'varchar' })
