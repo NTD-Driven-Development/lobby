@@ -1,7 +1,9 @@
-version: '3'
+# version: '3'
 services:
   db:
     image: postgres:16-alpine3.19
+    volumes:
+      - db-data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -28,3 +30,5 @@ services:
 networks: 
   docker: 
     driver: bridge
+volumes:
+  db-data:
