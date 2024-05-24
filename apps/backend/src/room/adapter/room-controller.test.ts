@@ -1,14 +1,8 @@
-import { CreateRoomEventSchema, RegisterGameEventSchema, RoomCreatedEventSchema, RoomStatus } from '@packages/domain'
+import { CreateRoomEventSchema, RegisterGameEventSchema, RoomCreated, RoomCreatedEventSchema, RoomStatus } from '@packages/domain'
 import { Client } from '@packages/socket'
 import io from 'socket.io-client'
 
 let client: Client
-let gameInfo = {
-    id: '',
-    name: '',
-    minPlayers: 0,
-    maxPlayers: 0,
-}
 
 describe('socket on room-controller', () => {
     beforeAll(() => {})
@@ -37,78 +31,78 @@ describe('socket on room-controller', () => {
     `, (done) => {
         // Emit sth from Client do Server
         client.on('game-registered', (event) => {
-            gameInfo = {
+            const gameInfo = {
                 id: event.data.id,
                 name: event.data.name,
                 minPlayers: event.data.minPlayers,
                 maxPlayers: event.data.maxPlayers,
             }
 
-            client.emit('create-room', {
-                type: 'create-room',
-                data: {
-                    name: '快來一起玩吧~',
-                    game: {
-                        id: gameInfo.id,
-                        name: gameInfo.name,
-                        minPlayers: gameInfo.minPlayers,
-                        maxPlayers: gameInfo.maxPlayers,
-                    },
-                    minPlayers: 4,
-                    maxPlayers: 4,
-                    password: '123',
-                },
-            } as CreateRoomEventSchema)
-
+            client.emit('create-room', givenCreateRoom(gameInfo))
             client.on('room-created', (event) => {
                 // then
-                expect(event.data).toEqual(
-                    expect.objectContaining<RoomCreatedEventSchema['data']>({
-                        roomId: expect.any(String),
-                        name: '快來一起玩吧~',
-                        game: {
-                            id: gameInfo.id,
-                            name: gameInfo.name,
-                            minPlayers: gameInfo.minPlayers,
-                            maxPlayers: gameInfo.maxPlayers,
-                        },
-                        host: {
-                            id: expect.any(String),
-                            name: expect.any(String),
-                            isReady: true,
-                        },
-                        currentPlayers: [
-                            {
-                                id: expect.any(String),
-                                name: expect.any(String),
-                                isReady: true,
-                            },
-                        ],
-                        minPlayers: 4,
-                        maxPlayers: 4,
-                        password: '123',
-                        createdAt: expect.any(String),
-                        status: RoomStatus.WAITING,
-                        isClosed: false,
-                        gameUrl: null,
-                    }),
-                )
+                assertRoomCreatedSuccessfully(event, gameInfo)
                 done()
             })
         })
 
-        client.emit('register-game', {
-            type: 'register-game',
-            data: {
-                name: 'Big Two',
-                description: '待議',
-                rule: '待議',
-                minPlayers: 4,
-                maxPlayers: 4,
-                imageUrl: null,
-                frontendUrl: 'http://localhost:3000',
-                backendUrl: 'http://localhost:8000/api',
-            },
-        } as RegisterGameEventSchema)
+        client.emit('register-game', givenRegisterGame('大老二'))
     })
 })
+
+const givenRegisterGame = (name: string) => {
+    return {
+        type: 'register-game',
+        data: {
+            name: name,
+            description: '待議',
+            rule: '待議',
+            minPlayers: 4,
+            maxPlayers: 4,
+            imageUrl: null,
+            frontendUrl: 'http://localhost:3000',
+            backendUrl: 'http://localhost:8000/api',
+        },
+    } as RegisterGameEventSchema
+}
+function assertRoomCreatedSuccessfully(event: RoomCreated, gameInfo: { id: string; name: string; minPlayers: number; maxPlayers: number }) {
+    expect(event.data).toEqual(
+        expect.objectContaining<RoomCreatedEventSchema['data']>({
+            roomId: expect.any(String),
+            name: givenCreateRoom(gameInfo).data.name,
+            game: givenCreateRoom(gameInfo).data.game,
+            host: {
+                id: expect.any(String),
+                name: expect.any(String),
+                isReady: true,
+            },
+            currentPlayers: [
+                {
+                    id: expect.any(String),
+                    name: expect.any(String),
+                    isReady: true,
+                },
+            ],
+            minPlayers: givenCreateRoom(gameInfo).data.minPlayers,
+            maxPlayers: givenCreateRoom(gameInfo).data.maxPlayers,
+            password: givenCreateRoom(gameInfo).data.password,
+            createdAt: expect.any(String),
+            status: RoomStatus.WAITING,
+            isClosed: false,
+            gameUrl: null,
+        }),
+    )
+}
+
+function givenCreateRoom(gameInfo: { id: string; name: string; minPlayers: number; maxPlayers: number }): CreateRoomEventSchema {
+    return {
+        type: 'create-room',
+        data: {
+            name: '快來一起玩吧~',
+            game: gameInfo,
+            minPlayers: 4,
+            maxPlayers: 4,
+            password: '123',
+        },
+    } as CreateRoomEventSchema
+}
