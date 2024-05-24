@@ -23,13 +23,18 @@ export class Hand extends Group {
     }
 
     // 抽牌
-    drawCard = async (hand: Hand, idxs: number[]) => new Promise((resolve, reject) => {
+    drawCard = async (hand: Hand, idxs: number[], events?: DrawingEvents) => new Promise((resolve, reject) => {
         const animator = new DrawingAnimator(hand, this, idxs);
         
-        animator.onAnimated = () => {
+        animator.onAnimated = async () => {
+            await events?.onAnimated?.();
+            
             _.remove(this.drawingAnimators, (v) => v == animator);
             return resolve(true);
         };
+        animator.onCardAtCenter = async (cards) => {
+            await events?.onCardAtCenter?.(cards);
+        }
 
         this.drawingAnimators.push(animator);
     });
@@ -56,45 +61,39 @@ export class Hand extends Group {
     }
 }
 
-class DrawingAnimator {
+interface DrawingEvents {
+    onCardAtCenter?: (cards: Card[]) => Promise<void>,
+    onAnimated?: () => Promise<void>,
+}
+
+class DrawingAnimator implements DrawingEvents {
     private fromHand: Hand;
     private toHand: Hand;
     private cards: Card[];
-    private currentFromStep: number;
-    private fromSteps: number[];
-    private currentToStep: number;
-    private toSteps: number[];
+    private currentFromStep: number = 0;
+    private fromSteps: number[] = [];
+    private currentToStep: number = 0;
+    private toSteps: number[] = [];
     private checkPoint: paper.Point;
     private tempCheckPoint?: paper.Point;
-    private diffFromVectorConfigs: DiffConfig[];
-    private diffReserveFromVectorConfigs: DiffConfig[];
-    private diffToVectorConfigs: DiffConfig[];
-    private diffReserveToVectorConfigs: DiffConfig[];
+    private diffFromVectorConfigs: DiffConfig[] = [];
+    private diffReserveFromVectorConfigs: DiffConfig[] = [];
+    private diffToVectorConfigs: DiffConfig[] = [];
+    private diffReserveToVectorConfigs: DiffConfig[] = [];
     private options: DrawingOptions;
 
-    onAnimated?: () => void;
+    onCardAtCenter?: (cards: Card[]) => Promise<void>;
+    onAnimated?: () => Promise<void>;
 
     constructor(fromHand: Hand, toHand: Hand, idx: number[], options?: Partial<DrawingOptions>) {
         this.fromHand = fromHand;
         this.toHand = toHand;
         this.cards = this.fromHand.cards?.filter((v, i) => Array.from(new Set(idx)).includes(i));
-        this.checkPoint = this.toHand.localToGlobal(this.toHand.bounds.center.subtract(this.toHand.bounds.point));
-        this.diffFromVectorConfigs = [];
-        this.diffReserveFromVectorConfigs = [];
-        this.diffToVectorConfigs = [];
-        this.diffReserveToVectorConfigs = [];
+        this.checkPoint = this.toHand.localToGlobal(this.toHand.bounds.size.multiply(0.5));
         this.options = _.defaults(options, { time: 3 });
-        this.currentFromStep = 0;
-        this.fromSteps = [];
-        this.currentToStep = 0;
-        this.toSteps = [];
-
-        this.cards.forEach((v) => {
-            // v.clipped = false;
-        });
     }
 
-    moveNext = () => {
+    moveNext = async () => {
         if (this.currentToStep == this.toSteps.length - 1) {
             return;
         }
@@ -125,6 +124,10 @@ class DrawingAnimator {
             });
 
             this.currentFromStep += 1;
+
+            if (this.currentFromStep == this.fromSteps.length - 1) {
+                await this.onCardAtCenter?.(this.cards);
+            }
         }
         else if (this.currentToStep < this.toSteps.length - 1) {
             const diff = this.toSteps[this.currentToStep + 1] - this.toSteps[this.currentToStep];
@@ -152,7 +155,6 @@ class DrawingAnimator {
                     this.toHand.cards.push(c.card);
                     
                     this.toHand.addChild(c.card);
-                    // c.card.clipped = true;
                 });
 
                 this.onAnimated?.();
@@ -256,12 +258,12 @@ class PlayingAnimator {
     private discardPile: DiscardPile;
     private hand: Hand;
     private cards: Card[];
-    private currentStep: number;
-    private steps: number[];
+    private currentStep: number = 0;
+    private steps: number[] = [];
     private checkPoint: paper.Point;
     private tempCheckPoint?: paper.Point;
-    private diffConfigs: DiffConfig[];
-    private diffReserveVectorConfigs: DiffConfig[];
+    private diffConfigs: DiffConfig[] = [];
+    private diffReserveVectorConfigs: DiffConfig[] = [];
     private options: PlayingOptions;
 
     onAnimated?: () => void;
@@ -271,15 +273,7 @@ class PlayingAnimator {
         this.hand = hand;
         this.cards = hand.cards.filter((v, i) => idxs.includes(i));
         this.checkPoint = this.discardPile.localToGlobal(this.discardPile.bounds.center.subtract(this.discardPile.bounds.point));
-        this.diffConfigs = [];
-        this.diffReserveVectorConfigs = [];
-        this.currentStep = 0;
-        this.steps = [];
         this.options = _.defaults(options, { time: 1, rotate: 20, offset: _.random(-20, 20) });
-
-        this.cards.forEach((v) => {
-            // this.discardPile.insertBelow(v);
-        });
     }
 
     moveNext = () => {
