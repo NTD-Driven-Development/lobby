@@ -6,7 +6,7 @@ import { autoInjectable, inject } from 'tsyringe'
 import { RoomRepositoryImpl } from '../repository/room-repository-impl'
 import { RoomRepository } from '../repository/room-repository'
 
-export type CreateRoomInput = CreateRoomCommandSchema
+export type CreateRoomInput = Omit<CreateRoomCommandSchema, 'players'>
 
 @autoInjectable()
 export class CreateRoomUseCase implements UseCase<CreateRoomInput, void> {
@@ -22,7 +22,10 @@ export class CreateRoomUseCase implements UseCase<CreateRoomInput, void> {
 
     async execute(input: CreateRoomInput): Promise<void> {
         const room = new Room(v4())
-        room.createRoom(input)
+        room.createRoom({
+            ...input,
+            players: [input.host],
+        })
         await this.roomRepository.save(room)
         const events = room.getDomainEvents()
         this.eventBus.broadcast(events)
