@@ -64,10 +64,6 @@ export class Deck extends Group {
         const deck = new Deck();
         deck.position = position;
 
-        setInterval(() => {
-            deck.bringToFront();
-        }, 100);
-
         for (const type of _.range(4)) {
             for (const no of _.range(13)) {
                 const count = deck.cards.length;
@@ -76,7 +72,7 @@ export class Deck extends Group {
                 card.position = deck.bounds.center.add([count / 3, count / -1]);
                 card.cardType = type + 1;
                 card.cardNo = no + 1;
-                card.faceDown = false;
+                card.faceDown = true;
                 await deck.push(card, { time: 0.01 });
                 await new Promise((r) => setTimeout(r, 20));
             }
@@ -89,7 +85,7 @@ export class Deck extends Group {
             card.position = deck.bounds.center.add([count / 3, count / -1])
             card.cardType = 5;
             card.cardNo = no + 1;
-            card.faceDown = false;
+            card.faceDown = true;
             await deck.push(card, { time: 0.01 });
             await new Promise((r) => setTimeout(r, 20));
         }

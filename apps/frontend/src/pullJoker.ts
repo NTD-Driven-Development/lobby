@@ -54,11 +54,43 @@ export class PullJoker extends Project {
                     await this.deck.deal(hand4);
             }
 
+            this.deck.remove();
+
             while (true) {
-                await hand2.drawCard(hand1, _.sampleSize(_.range(hand1.cards.length - 1), 3));
-                await hand3.drawCard(hand2, _.sampleSize(_.range(hand2.cards.length - 1), 3));
-                await hand4.drawCard(hand3, _.sampleSize(_.range(hand3.cards.length - 1), 3));
-                await hand1.drawCard(hand4, _.sampleSize(_.range(hand4.cards.length - 1), 3));
+                await hand2.drawCard(hand1, _.sampleSize(_.range(hand1.cards.length - 1), 5), {
+                    onCardAtCenter: async (cards) => {
+                        _.each(cards, (v) => {
+                            v.faceDown = false;
+                        });
+                        await new Promise((r) => setTimeout(r, 2000));
+                    },
+                });
+                // await hand2.play(this.discardPile, [0, 1]);
+                await hand3.drawCard(hand2, _.sampleSize(_.range(hand2.cards.length - 1), 5), {
+                    onCardAtCenter: async (cards) => {
+                        _.each(cards, (v) => {
+                            v.faceDown = false;
+                        });
+                    },
+                });
+                // await hand3.play(this.discardPile, [0, 1]);
+                await hand4.drawCard(hand3, _.sampleSize(_.range(hand3.cards.length - 1), 5), {
+                    onCardAtCenter: async (cards) => {
+                        _.each(cards, (v) => {
+                            v.faceDown = false;
+                        });
+                    },
+                });
+                // await hand4.play(this.discardPile, [0, 1]);
+                await hand1.drawCard(hand4, _.sampleSize(_.range(hand4.cards.length - 1), 5), {
+                    onCardAtCenter: async (cards) => {
+                        _.each(cards, (v) => {
+                            v.faceDown = false;
+                        });
+                    },
+                });
+                // await hand1.play(this.discardPile, [0, 1]);
+
             }
 
             // this.deck.remove();
