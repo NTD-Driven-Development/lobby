@@ -42,14 +42,21 @@ export default {
     }),
     marker: {
         class: [
+            'relative',
+
             // Display & Flexbox
-            'flex self-baseline',
+            'inline-flex items-center justify-center',
 
             // Size
-            'w-4 h-4',
+            'w-[1.125rem] h-[1.125rem]',
 
             // Appearance
-            'rounded-full border-2 border-primary-500 bg-surface-0 dark:border-primary-300 dark:bg-surface-900/40'
+            'rounded-full border-2 border-surface-200 bg-surface-0 dark:border-surface-700 dark:bg-surface-950',
+
+            // Before
+            'before:rounded-full before:w-[0.375rem] before:h-[0.375rem] before:bg-primary',
+            // After
+            'after:absolute after:rounded-full after:w-full after:h-full after:shadow-sm'
         ]
     },
     connector: ({ props }) => ({
@@ -73,8 +80,8 @@ export default {
                 'text-right': props.align === 'right' || (props.layout === 'vertical' && props.align === 'alternate' && context.index % 2 === 1)
             },
             {
-                'min-h-0': props.layout === 'vertical' && context.index === context.count,
-                'grow-0': props.layout === 'horizontal' && context.index === context.count
+                'min-h-0': props.layout === 'vertical' && context.index === context.count - 1,
+                'grow-0': props.layout === 'horizontal' && context.index === context.count - 1
             }
         ]
     })

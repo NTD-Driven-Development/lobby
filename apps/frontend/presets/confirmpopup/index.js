@@ -11,17 +11,16 @@ export default {
             'mt-3 absolute left-0 top-0',
 
             // Color
-            'dark:border',
-            'dark:border-surface-700',
-            'bg-surface-0 dark:bg-surface-800',
+            'bg-surface-0 dark:bg-surface-900',
             'text-surface-700 dark:text-surface-0/80',
 
             // Before: Arrow
-            'before:absolute before:w-0 before:-top-3 before:h-0 before:border-transparent before:border-solid before:ml-6 before:border-x-[0.75rem] before:border-b-[0.75rem] before:border-t-0 before:border-b-surface-0 dark:before:border-b-surface-800'
+            'before:absolute before:w-0 before:-top-3 before:h-0 before:border-transparent before:border-solid before:ml-[calc(var(--overlayArrowLeft,0)+1.25rem)] before:border-x-[10px] before:border-b-[10px] before:border-t-0 before:border-b-surface-200 dark:before:border-b-surface-700',
+            'after:absolute after:w-0 after:-top-[0.54rem] after:h-0 after:border-transparent after:border-solid after:ml-[calc(var(--overlayArrowLeft,0)+1.3rem)] after:border-x-[9px] after:border-b-[8px] after:border-t-0 after:border-b-surface-0 dark:after:border-b-surface-900'
         ]
     },
     content: {
-        class: 'p-5 items-center flex'
+        class: ['p-4 items-center flex', 'rounded-t-lg', 'border-x border-t last:border-b border-surface-200 dark:border-surface-700']
     },
     icon: {
         class: 'text-2xl mr-4'
@@ -35,16 +34,17 @@ export default {
             'gap-2',
 
             // Spacing
-            'px-6',
-            'pb-6',
+            'px-4',
+            'pb-4',
 
             // Shape
             'border-t-0',
             'rounded-b-lg',
 
             // Colors
-            'bg-surface-0 dark:bg-surface-800',
-            'text-surface-700 dark:text-surface-0/80'
+            'bg-surface-0 dark:bg-surface-900',
+            'text-surface-700 dark:text-surface-0/80',
+            'border-x border-b border-surface-200 dark:border-surface-700'
         ]
     },
     rejectbutton: {
@@ -56,18 +56,18 @@ export default {
                 'items-center inline-flex text-center align-bottom justify-center',
 
                 // Sizes & Spacing
-                'px-4 py-3 leading-none',
+                'px-4 py-2 leading-none',
 
                 // Shape
                 'rounded-md',
 
                 // Color
-                'text-primary-500 dark:text-primary-400',
+                'text-primary',
 
                 // States
                 'hover:bg-primary-300/20',
                 'focus:outline-none focus:outline-offset-0 focus:ring',
-                'focus:ring-primary-400/50 dark:focus:ring-primary-300/50'
+                'focus:ring-primary-500 dark:focus:ring-primary-400'
             ]
         }
     },
@@ -80,20 +80,20 @@ export default {
                 'items-center inline-flex text-center align-bottom justify-center',
 
                 // Sizes & Spacing
-                'px-4 py-3 leading-none',
+                'px-4 py-2 leading-none',
 
                 // Shape
                 'rounded-md',
 
                 // Color
-                'text-white dark:text-surface-900',
-                'bg-primary-500 dark:bg-primary-400',
-                'border border-primary-500 dark:border-primary-400',
+                'text-primary-inverse',
+                'bg-primary',
+                'border border-primary',
 
                 // States
-                'hover:bg-primary-600 dark:hover:bg-primary-300 hover:border-primary-600 dark:hover:border-primary-300',
+                'hover:bg-primary-hover hover:border-primary-hover',
                 'focus:outline-none focus:outline-offset-0 focus:ring',
-                'focus:ring-primary-400/50 dark:focus:ring-primary-300/50'
+                'focus:ring-primary-500 dark:focus:ring-primary-400'
             ]
         }
     },

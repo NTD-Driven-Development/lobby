@@ -10,7 +10,7 @@ export default {
         root: ({ props, context, parent }) => ({
             class: [
                 // Font
-                'font-sans leading-none',
+                'leading-none',
 
                 // Flex & Alignment
                 { 'flex-1 w-[1%]': parent.instance.$name == 'InputGroup' },
@@ -18,9 +18,7 @@ export default {
 
                 // Spacing
                 'm-0',
-                {
-                    'p-3': props.size == null
-                },
+                'py-2 px-3',
 
                 // Size
                 'w-10',
@@ -32,24 +30,23 @@ export default {
                 { 'first:ml-0 ml-[-1px]': parent.instance.$name == 'InputGroup' && !props.showButtons },
 
                 // Colors
-                'text-surface-600 dark:text-surface-200',
+                'text-surface-800 dark:text-white/80',
                 'placeholder:text-surface-400 dark:placeholder:text-surface-500',
-                'bg-surface-0 dark:bg-surface-900',
+                { 'bg-surface-0 dark:bg-surface-950': !context.disabled },
                 'border',
-                { 'border-surface-300 dark:border-surface-600': !props.invalid },
+                { 'border-surface-300 dark:border-surface-700': !props.invalid },
 
                 // Invalid State
+                'invalid:focus:ring-red-200',
+                'invalid:hover:border-red-500',
                 { 'border-red-500 dark:border-red-400': props.invalid },
 
                 // States
                 {
-                    'hover:border-primary-500 dark:hover:border-primary-400': !context.disabled && !props.invalid,
-                    'focus:outline-none focus:outline-offset-0 focus:ring focus:ring-primary-500/50 dark:focus:ring-primary-400/50 focus:z-10': !context.disabled,
-                    'opacity-60 select-none pointer-events-none cursor-default': context.disabled
+                    'hover:border-surface-400 dark:hover:border-surface-600': !context.disabled && !props.invalid,
+                    'focus:outline-none focus:outline-offset-0 focus:ring-1 focus:ring-primary-500 dark:focus:ring-primary-400 focus:z-10': !context.disabled,
+                    'bg-surface-200 dark:bg-surface-700 select-none pointer-events-none cursor-default': context.disabled
                 },
-
-                // Filled State *for FloatLabel
-                { filled: parent.instance?.$name == 'FloatLabel' && context.filled },
 
                 // Misc
                 'appearance-none',
