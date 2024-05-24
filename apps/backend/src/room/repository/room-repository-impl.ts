@@ -35,8 +35,6 @@ export class RoomRepositoryImpl implements RoomRepository {
 }
 
 function toData(aggregate: Room) {
-    console.log(aggregate.players)
-    console.log(typeof aggregate.players)
     const data = new RoomData()
     data.id = aggregate.id
     data.name = aggregate.name as string
