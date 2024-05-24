@@ -35,7 +35,7 @@ services:
   #   ports:
   #     - "3000:3000"
   #   networks:
-  #     - internal
+  #     - docker
 
 networks: 
   docker: 

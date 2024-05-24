@@ -10,7 +10,10 @@ env.config()
 
 declare module 'socket.io' {
     interface Socket {
-        auth: { user: JWTPayload; header: JWTHeaderParameters }
+        auth: {
+            user: { email: string; name: string } | JWTPayload
+            header: JWTHeaderParameters
+        }
     }
 }
 
