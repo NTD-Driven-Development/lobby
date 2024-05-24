@@ -4,7 +4,7 @@ dotenv.config({ path: `.env.${process.env.NODE_ENV}` })
 import 'reflect-metadata'
 import fastify from 'fastify'
 import socketIO from 'fastify-socket.io'
-import { GameEventHandlers } from '~/routes'
+import { GameEventHandlers, RoomEventHandlers } from '~/routes'
 import { Server } from '@packages/socket'
 import { Socket } from 'socket.io'
 import { container } from 'tsyringe'
@@ -34,6 +34,7 @@ import { AppDataSource } from './data/data-source'
 
                 console.info('Socket connected!', socket.id)
 
+                RoomEventHandlers(socket)
                 GameEventHandlers(socket)
 
                 socket.on('disconnect', () => console.info('Socket disconnected!', socket.id))
