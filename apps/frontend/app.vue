@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<NuxtPage></NuxtPage>
-		<Toast group="invitation" :pt="{
+		<!-- <Toast group="invitation" :pt="{
 			root: 'w-80 rounded-md',
 			content: 'flex p-2 items-start lg:p-3',
 		}">
@@ -18,20 +18,16 @@
 					</div>
                 </div>
             </template>
-		</Toast>
+		</Toast> -->
 	</div>
 </template>
 
 <script setup lang="ts">
+	const appStore = useAppStore();
+	const { lobbySocket } = storeToRefs(appStore);
 	const toast = useToast();
 
-	const showInvitation = () => {
-		toast.add({ severity: 'info', summary: '房間邀請', detail: '來和我一起玩大老二吧！', group: 'invitation' });
-	}
-
-	onMounted(() => {
-	// setInterval(() => {
-		showInvitation();
-	// }, 2000);
-	});
+	// const showInvitation = () => {
+	// 	toast.add({ severity: 'info', summary: '房間邀請', detail: '來和我一起玩大老二吧！', group: 'invitation' });
+	// }
 </script>

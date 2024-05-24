@@ -1,7 +1,7 @@
 export default {
     accordiontab: {
         root: {
-            class: 'mb-1'
+            class: ['mb-0', 'border-b border-surface-200 dark:border-surface-700']
         },
         header: ({ props }) => ({
             class: [
@@ -9,61 +9,56 @@ export default {
                 { 'select-none pointer-events-none cursor-default opacity-60': props?.disabled }
             ]
         }),
-        headerAction: ({ context }) => ({
+        headerAction: {
             class: [
                 //Font
-                'font-bold',
+                'font-semibold',
                 'leading-none',
 
                 // Alignments
-                'flex items-center',
+                'flex justify-between items-center',
+                'flex-row-reverse',
                 'relative',
 
                 // Sizing
-                'p-5',
+                'p-[1rem] md:p-[1.125rem]',
 
                 // Shape
-                'rounded-t-md',
-                { 'rounded-br-md rounded-bl-md': !context.active, 'rounded-br-0 rounded-bl-0': context.active },
+                'rounded-md',
+                'border-0',
 
                 // Color
-                'border border-surface-200 dark:border-surface-700',
-                'bg-surface-50 dark:bg-surface-800',
+                'bg-surface-0 dark:bg-surface-900',
                 'text-surface-600 dark:text-surface-0/80',
-                { 'text-surface-900': context.active },
 
                 // Transition
                 'transition duration-200 ease-in-out',
                 'transition-shadow duration-200',
 
                 // States
-                'hover:bg-surface-100 dark:hover:bg-surface-700/40',
-                'hover:text-surface-900',
-                'focus:outline-none focus:outline-offset-0 focus-visible:ring focus-visible:ring-primary-400/50 ring-inset dark:focus-visible:ring-primary-300/50', // Focus
+                'focus:outline-none focus:outline-offset-0 focus-visible:ring-1 focus-visible:ring-primary-400 dark:focus-visible:ring-primary-300', // Focus
 
                 // Misc
                 'cursor-pointer no-underline select-none'
             ]
-        }),
-        headerIcon: {
-            class: 'inline-block mr-2'
         },
+        headerIcon: ({ context }) => ({
+            class: ['inline-block ml-2', { 'text-surface-900 dark:text-surface-0': context.active }]
+        }),
         headerTitle: {
             class: 'leading-none'
         },
         content: {
             class: [
                 // Spacing
-                'p-5',
+                'p-2 md:p-[1.125rem] pt-0',
 
                 //Shape
-                'rounded-tl-none rounded-tr-none rounded-br-lg rounded-bl-lg',
-                'border-t-0',
+                'border-0 rounded-none',
 
                 // Color
-                'bg-surface-0 dark:bg-surface-800',
-                'border border-surface-200 dark:border-surface-700',
-                'text-surface-700 dark:text-surface-0/80'
+                'bg-surface-0 dark:bg-surface-900',
+                'text-surface-600 dark:text-surface-0/70'
             ]
         },
         transition: {

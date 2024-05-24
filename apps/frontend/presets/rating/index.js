@@ -5,7 +5,7 @@ export default {
 
             // Flex & Alignment
             'flex items-center',
-            'gap-2',
+            'gap-1',
 
             // Misc
             {
@@ -20,7 +20,7 @@ export default {
 
             //State
             {
-                'outline-none ring ring-primary-500/50 dark:ring-primary-400/50': context.focused
+                'outline-none ring-1 ring-primary-500/50 dark:ring-primary-500': context.focused
             },
 
             // Misc
@@ -30,7 +30,7 @@ export default {
     cancelicon: {
         class: [
             // Size
-            'w-5 h-5',
+            'w-4 h-4',
 
             // Color
             'text-red-500 dark:text-red-400',
@@ -49,7 +49,7 @@ export default {
 
             // State
             {
-                'outline-none ring ring-primary-500/50 dark:ring-primary-400/50': context.focused
+                'outline-none ring-1 ring-primary-500/50 dark:ring-primary-500': context.focused
             },
 
             // Misc
@@ -62,7 +62,7 @@ export default {
     officon: ({ props }) => ({
         class: [
             // Size
-            'w-5 h-5',
+            'w-4 h-4',
 
             // Color
             'text-surface-700 dark:text-surface-0/80',
@@ -77,10 +77,10 @@ export default {
     onicon: ({ props }) => ({
         class: [
             // Size
-            'w-5 h-5',
+            'w-4 h-4',
 
             // Color
-            'text-primary-500 dark:text-primary-400',
+            'text-primary',
 
             // State
             { 'hover:text-primary-600 dark:hover:text-primary-300': !props.readonly },
