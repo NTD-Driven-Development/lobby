@@ -8,11 +8,16 @@ import { Auth0TestFeatureToggle } from '~/feature-toggle'
 import env from 'dotenv'
 env.config()
 
+export interface Auth0User extends JWTPayload {
+    email: string
+    name: string
+}
+
 declare module 'socket.io' {
     interface Socket {
         auth: {
-            user: { email: string; name: string } | JWTPayload
-            header: JWTHeaderParameters
+            user: Readonly<Auth0User>
+            header: Readonly<JWTHeaderParameters>
         }
     }
 }
@@ -71,8 +76,7 @@ const auth0Middleware: SocketIOMiddlewareFactory = (domainParam?: string, audien
         const jwt = authHandshakeTokenSplitted[1]
 
         try {
-            const { payload, protectedHeader } = await jwtVerify(jwt, JWKS, config)
-
+            const { payload, protectedHeader } = await jwtVerify<Auth0User>(jwt, JWKS, config)
             socket.auth = { user: payload, header: protectedHeader }
         } catch (err) {
             return next(new Error('Failed to verify claims, user not authorized'))
