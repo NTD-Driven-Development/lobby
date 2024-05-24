@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { CreateRoomEventSchema, Player } from '@packages/domain'
+import { CreateRoomEventSchema } from '@packages/domain'
 import { autoInjectable, inject } from 'tsyringe'
 import { CreateRoomUseCase } from '../usecases/create-room-usecase'
+import { Auth0User } from '~/middleware/socket-auth0'
 
 // @autoInjectable()
 // export class RoomController {
@@ -18,15 +19,14 @@ export class RoomController {
     ) {
         this.createRoomUseCase = createRoomUseCase
     }
-    public async createRoom(event: CreateRoomEventSchema, host: Player) {
-        console.log('create-room', event)
-        console.log('host', host)
-        const createRoomData = {
+    public async createRoom(event: CreateRoomEventSchema, user: Auth0User) {
+        await this.createRoomUseCase.execute({
             ...event.data,
-            host: host,
-            players: [host],
-        }
-
-        await this.createRoomUseCase.execute(createRoomData)
+            host: {
+                id: user.email,
+                name: user.name,
+                isReady: true,
+            },
+        })
     }
 }

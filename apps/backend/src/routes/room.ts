@@ -12,11 +12,6 @@ import { RoomController } from '~/room/adapter/room-controller'
 export const RoomEventHandlers = (socket: Server) => {
     const roomController = container.resolve(RoomController)
     socket.on('create-room', async (event) => {
-        const user = socket.auth.user
-        await roomController.createRoom(event, {
-            id: user.email as string,
-            name: user.name as string,
-            isReady: true,
-        })
+        await roomController.createRoom(event, socket.auth.user)
     })
 }
