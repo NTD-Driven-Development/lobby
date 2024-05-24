@@ -2,7 +2,7 @@ export default {
     root: ({ context }) => ({
         class: [
             // Font
-            'font-bold font-sans',
+            'font-bold',
             'text-xs leading-5',
 
             // Alignment
@@ -28,9 +28,9 @@ export default {
             },
 
             // Color
-            'text-white dark:text-surface-900',
+            'text-primary-inverse',
             {
-                'bg-primary-500 dark:bg-primary-400': !context.info && !context.success && !context.warning && !context.danger && !context.help && !context.secondary,
+                'bg-primary': !context.info && !context.success && !context.warning && !context.danger && !context.help && !context.secondary,
                 'bg-surface-500 dark:bg-surface-400': context.secondary,
                 'bg-green-500 dark:bg-green-400': context.success,
                 'bg-blue-500 dark:bg-blue-400': context.info,

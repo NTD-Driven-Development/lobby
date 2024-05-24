@@ -7,11 +7,11 @@ export default {
 
             // Shape and Size
             'border-0',
-            'h-6',
+            'h-5',
             'rounded-md',
 
             // Colors
-            'bg-surface-100 dark:bg-surface-700'
+            'bg-surface-100 dark:bg-surface-800'
         ]
     },
     value: ({ props }) => ({
@@ -20,7 +20,7 @@ export default {
             { 'absolute flex items-center justify-center overflow-hidden': props.mode !== 'indeterminate' },
 
             // Colors
-            'bg-primary-500 dark:bg-primary-400',
+            'bg-primary',
 
             // Spacing & Sizing
             'm-0',
@@ -44,12 +44,15 @@ export default {
     }),
     label: {
         class: [
+            //Font
+            'text-xs font-semibold',
+
             // Flexbox
             'inline-flex',
 
             // Font and Text
             'text-white dark:text-surface-900',
-            'leading-6'
+            'leading-5'
         ]
     }
 };

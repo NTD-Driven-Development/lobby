@@ -8,8 +8,7 @@ export default {
             'p-4',
 
             // Color
-            'bg-surface-0 dark:bg-surface-700',
-            'border border-surface-200 dark:border-surface-700',
+            'bg-surface-0 dark:bg-surface-900',
 
             // Misc
             'overflow-x-auto'
@@ -37,7 +36,7 @@ export default {
 
             // States
             'focus-visible:outline-none focus-visible:outline-offset-0',
-            'focus-visible:ring focus-visible:ring-primary-400/50 dark:focus-visible:ring-primary-300/50',
+            'focus-visible:ring-1 focus-visible:ring-primary-500 dark:focus-visible:ring-primary-400',
 
             // Transitions
             'transition-shadow duration-200',
@@ -55,7 +54,7 @@ export default {
             'flex items-center',
 
             // Spacing
-            ' mx-2',
+            'mx-2',
 
             // Color
             'text-surface-600 dark:text-white/70'
