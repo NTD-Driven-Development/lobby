@@ -20,12 +20,10 @@ export class GameController {
     }
 
     public async registerGame(event: RegisterGameEventSchema) {
-        console.log('register-game', event)
         await this.registerGameUseCase.execute(event.data)
     }
 
     public async updateGameInfo(event: UpdateGameInfoEventSchema) {
-        console.log('update-game-info', event)
         await this.updateGameInfoUseCase.execute(event.data)
     }
 
