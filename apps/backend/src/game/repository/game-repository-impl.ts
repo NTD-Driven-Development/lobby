@@ -31,7 +31,10 @@ export class GameRepositoryImpl implements GameRepository {
         throw new Error('Method not implemented.')
     }
     public async save(aggregate: Game): Promise<void> {
-        await this.repo.save(toData(aggregate))
+        await this.repo.save({
+            ...toData(aggregate),
+            version: aggregate.getVersion() + 1,
+        })
     }
     public async delete(aggregate: Game): Promise<void> {
         throw new Error('Method not implemented.')
