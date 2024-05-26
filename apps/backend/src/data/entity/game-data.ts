@@ -5,39 +5,39 @@ export class GameData extends BaseEntity {
     @PrimaryColumn({ type: 'uuid', name: 'id' })
     id!: string
 
-    @Column({ type: 'varchar' })
+    @Column({ type: 'varchar', name: 'name' })
     name!: string
 
-    @Column({ type: 'text' })
+    @Column({ type: 'text', name: 'description' })
     description!: string
 
-    @Column({ type: 'text' })
+    @Column({ type: 'text', name: 'rule' })
     rule!: string
 
-    @Column({ type: 'int' })
+    @Column({ type: 'int', name: 'min_players' })
     minPlayers!: number
 
-    @Column({ type: 'int' })
+    @Column({ type: 'int', name: 'max_players' })
     maxPlayers!: number
 
-    @Column({ type: 'varchar', nullable: true })
+    @Column({ type: 'varchar', name: 'image_url', nullable: true })
     imageUrl!: string | null
 
-    @Column({ type: 'varchar' })
+    @Column({ type: 'varchar', name: 'frontend_url' })
     frontendUrl!: string
 
-    @Column({ type: 'varchar' })
+    @Column({ type: 'varchar', name: 'backend_url' })
     backendUrl!: string
 
-    @Column({ type: 'enum', enum: ['ONLINE', 'OFFLINE'] })
+    @Column({ type: 'enum', name: 'status', enum: ['ONLINE', 'OFFLINE'], unique: false })
     status!: 'ONLINE' | 'OFFLINE'
 
-    @Column({ type: 'int' })
+    @Column({ type: 'int', name: 'version' })
     version!: number
 
-    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    @Column({ type: 'timestamp', name: 'created_at', default: () => 'CURRENT_TIMESTAMP' })
     createdAt!: Date
 
-    @Column({ type: 'timestamp', nullable: true })
+    @Column({ type: 'timestamp', name: 'updated_at', nullable: true, default: null })
     updatedAt?: Date | null
 }

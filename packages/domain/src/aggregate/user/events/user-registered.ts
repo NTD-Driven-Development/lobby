@@ -6,7 +6,6 @@ export type UserRegisteredSchema = {
     id: UserId
     name: string
     email: string
-    identities: string[]
 }
 
 export class UserRegistered extends DomainEvent {

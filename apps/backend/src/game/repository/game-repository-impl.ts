@@ -25,7 +25,7 @@ export class GameRepositoryImpl implements GameRepository {
         )
     }
     public async findGameRegistrations(): Promise<Game[]> {
-        throw new Error('Method not implemented.')
+        return (await this.repo.find()).map(toDomain)
     }
     public async getNumberOfTotalGameRegistrations(): Promise<number> {
         throw new Error('Method not implemented.')

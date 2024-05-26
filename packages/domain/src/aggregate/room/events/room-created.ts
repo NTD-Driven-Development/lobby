@@ -28,5 +28,5 @@ export type RoomCreatedEventSchema = RoomCreated
 
 export type CreateRoomEventSchema = {
     type: 'create-room'
-    data: CreateRoomCommandSchema
+    data: Omit<CreateRoomCommandSchema, 'host' | 'players'>
 }

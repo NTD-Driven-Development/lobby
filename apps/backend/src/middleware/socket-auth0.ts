@@ -3,19 +3,41 @@ import { URL } from 'url'
 
 import type { JWTHeaderParameters, JWTPayload } from 'jose'
 import { Server } from '@packages/socket'
+import { Auth0TestFeatureToggle } from '~/feature-toggle'
 
 import env from 'dotenv'
 env.config()
 
+export interface Auth0User extends JWTPayload {
+    email: string
+    name: string
+}
+
 declare module 'socket.io' {
     interface Socket {
-        auth?: { user: JWTPayload; header: JWTHeaderParameters }
+        auth: {
+            user: Readonly<Auth0User>
+            header: Readonly<JWTHeaderParameters>
+        }
     }
 }
 
 type SocketIOMiddlewareFactory = (domain?: string, audience?: string) => (socket: Server, next: (err?: Error) => void) => void
 
 const auth0Middleware: SocketIOMiddlewareFactory = (domainParam?: string, audienceParam?: string) => {
+    if (Auth0TestFeatureToggle.isEnabled()) {
+        return (socket, next) => {
+            socket.auth = {
+                user: { sub: 'google-oauth2|111xx', email: 'test@example.com', name: 'test' },
+                header: {
+                    alg: 'RS256',
+                    typ: 'JWT',
+                },
+            }
+            return next()
+        }
+    }
+
     const domain = domainParam ?? process.env.AUTH0_DOMAIN
     const audience = audienceParam ?? process.env.AUTH0_AUDIENCE
 
@@ -54,8 +76,7 @@ const auth0Middleware: SocketIOMiddlewareFactory = (domainParam?: string, audien
         const jwt = authHandshakeTokenSplitted[1]
 
         try {
-            const { payload, protectedHeader } = await jwtVerify(jwt, JWKS, config)
-
+            const { payload, protectedHeader } = await jwtVerify<Auth0User>(jwt, JWKS, config)
             socket.auth = { user: payload, header: protectedHeader }
         } catch (err) {
             return next(new Error('Failed to verify claims, user not authorized'))

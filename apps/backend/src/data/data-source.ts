@@ -1,7 +1,8 @@
 import dotenv from 'dotenv'
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` })
 import { DataSource } from 'typeorm'
-import { GameData } from '~/data/entity'
+import { GameData, RoomData } from '~/data/entity'
+import { ClearDatabaseFeatureToggle } from '~/feature-toggle'
 
 export const AppDataSource = new DataSource({
     type: process.env.DB_TYPE as 'mariadb' | 'mongodb' | 'mysql' | 'mssql' | 'postgres',
@@ -11,20 +12,12 @@ export const AppDataSource = new DataSource({
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     synchronize: true,
+    dropSchema: ClearDatabaseFeatureToggle.isEnabled(),
     logging: ['error'],
-    entities: [GameData],
+    entities: [GameData, RoomData],
     subscribers: [],
     migrations: [],
     extra: {
         connectionLimit: 10,
     },
 })
-
-AppDataSource.initialize()
-    .then(() => {
-        console.log('Database connected')
-    })
-    .catch((err) => {
-        console.error('Database connection error', err)
-        process.exit(1)
-    })

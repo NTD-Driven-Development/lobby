@@ -1,13 +1,25 @@
-version: '3'
+# version: '3'
 services:
   db:
     image: postgres:16-alpine3.19
+    volumes:
+      - db-data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: lobby
     ports:
       - "5432:5432"
+    networks:
+      - docker
+  db_test:
+    image: postgres:16-alpine3.19
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: lobby_test
+    ports:
+      - "5433:5432"
     networks:
       - docker
 
@@ -23,8 +35,10 @@ services:
   #   ports:
   #     - "3000:3000"
   #   networks:
-  #     - internal
+  #     - docker
 
 networks: 
   docker: 
     driver: bridge
+volumes:
+  db-data:

@@ -17,6 +17,7 @@ import {
     ChangeHostCommandSchema,
     CloseRoomCommandSchema,
     StartGameCommandSchema,
+    CreateRoomCommandSchema,
 } from '../command'
 import { Game } from '../../game'
 
@@ -29,13 +30,13 @@ export type RoomGameSchema = Required<Pick<Game, 'id' | 'name' | 'minPlayers' | 
 export class Room extends AggregateRoot<RoomId> {
     constructor(
         id: RoomId,
-        name: string,
-        game: RoomGameSchema,
-        host: Player,
-        players: Player[],
-        minPlayers: number,
-        maxPlayers: number,
-        createdAt: Date,
+        name?: string,
+        game?: RoomGameSchema,
+        host?: Player,
+        players?: Player[],
+        minPlayers?: number,
+        maxPlayers?: number,
+        createdAt?: Date,
         status?: RoomStatus,
         password?: string | null,
         isClosed?: boolean,
@@ -123,19 +124,7 @@ export class Room extends AggregateRoot<RoomId> {
         return this.password !== null
     }
 
-    public createRoom(payload: {
-        name: string
-        game: {
-            id: string
-            name: string
-            minPlayers: number
-            maxPlayers: number
-        }
-        host: Player
-        minPlayers: number
-        maxPlayers: number
-        password: string | null
-    }) {
+    public createRoom(payload: CreateRoomCommandSchema) {
         if (
             payload.minPlayers < payload.game.minPlayers ||
             payload.maxPlayers > payload.game.maxPlayers
