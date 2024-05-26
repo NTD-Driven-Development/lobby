@@ -167,16 +167,19 @@ export class Room extends AggregateRoot<RoomId> {
         this.apply(new RoomClosed({ roomId: this.id, isClosed: true }))
     }
 
-    public joinRoom(player: PlayerJoinRoomCommandSchema) {
+    public joinRoom(payload: PlayerJoinRoomCommandSchema) {
         if (this.isFull()) {
             throw new Error('The room is full')
+        }
+        if (this.isLocked() && payload.password !== this.password) {
+            throw new Error('Invalid password')
         }
         this.apply(
             new PlayerJoinedRoom({
                 roomId: this.id,
                 user: {
-                    id: player.userId,
-                    name: player.userName,
+                    id: payload.playerId,
+                    name: payload.playerName,
                     isReady: false,
                 },
             }),

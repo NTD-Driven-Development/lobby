@@ -18,5 +18,5 @@ export type PlayerJoinedRoomEventSchema = PlayerJoinedRoom
 
 export type PlayerJoinRoomEventSchema = {
     type: 'player-join-room'
-    data: PlayerJoinRoomCommandSchema
+    data: PlayerJoinRoomCommandSchema & { roomId: RoomId }
 }

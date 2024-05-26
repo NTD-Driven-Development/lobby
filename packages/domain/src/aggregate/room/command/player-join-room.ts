@@ -1,6 +1,7 @@
 import { PlayerId } from '../entity'
 
 export type PlayerJoinRoomCommandSchema = {
-    userId: PlayerId
-    userName: string
+    playerId: PlayerId
+    playerName: string
+    password?: string | null
 }
