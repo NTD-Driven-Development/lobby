@@ -98,11 +98,12 @@ function setUp(done: jest.DoneCallback) {
 }
 
 function assertRoomCreatedSuccessfully(event: RoomCreated, gameInfo: { id: string; name: string; minPlayers: number; maxPlayers: number }) {
+    const givenData = givenCreateRoom(gameInfo).data
     expect(event.data).toEqual(
         expect.objectContaining<RoomCreatedEventSchema['data']>({
             roomId: expect.any(String),
-            name: givenCreateRoom(gameInfo).data.name,
-            game: givenCreateRoom(gameInfo).data.game,
+            name: givenData.name,
+            game: givenData.game,
             host: {
                 id: expect.any(String),
                 name: expect.any(String),
@@ -115,9 +116,9 @@ function assertRoomCreatedSuccessfully(event: RoomCreated, gameInfo: { id: strin
                     isReady: true,
                 },
             ],
-            minPlayers: givenCreateRoom(gameInfo).data.minPlayers,
-            maxPlayers: givenCreateRoom(gameInfo).data.maxPlayers,
-            password: givenCreateRoom(gameInfo).data.password,
+            minPlayers: givenData.minPlayers,
+            maxPlayers: givenData.maxPlayers,
+            password: givenData.password,
             createdAt: expect.any(String),
             status: RoomStatus.WAITING,
             isClosed: false,
