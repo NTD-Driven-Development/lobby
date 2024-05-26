@@ -18,6 +18,10 @@ describe('socket on room-controller', () => {
             reconnectionDelay: 0,
             forceNew: true,
             transports: ['websocket'],
+            auth: {
+                email: 'test@gmail.com',
+                name: 'test',
+            },
         })
         client.on('connect', () => {
             done()
