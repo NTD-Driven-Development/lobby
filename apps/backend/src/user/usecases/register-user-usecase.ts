@@ -21,6 +21,8 @@ export class RegisterUserUseCase implements UseCase<RegisterUserInput, void> {
     }
 
     async execute(input: RegisterUserInput): Promise<void> {
+        const userExists = await this.userRepository.existsUserByEmail(input.email)
+        if (userExists) return
         const user = new User(v4(), input.email, input.name)
         user.register({
             email: user.email,
