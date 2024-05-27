@@ -1,6 +1,6 @@
 import { PlayerId } from '../entity'
 
-export type ChangePlayerReadinessCommandSchema = {
+export type ChangeReadinessCommandSchema = {
     playerId: PlayerId
     isReady: boolean
 }

@@ -28,7 +28,7 @@ const auth0Middleware: SocketIOMiddlewareFactory = (domainParam?: string, audien
     if (Auth0TestFeatureToggle.isEnabled()) {
         return (socket, next) => {
             socket.auth = {
-                user: { sub: 'google-oauth2|111xx', email: 'test@example.com', name: 'test' },
+                user: socket.handshake.auth as Auth0User,
                 header: {
                     alg: 'RS256',
                     typ: 'JWT',

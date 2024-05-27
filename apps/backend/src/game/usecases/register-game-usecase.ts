@@ -21,7 +21,17 @@ export class RegisterGameUseCase implements UseCase<RegisterGameInput, void> {
     }
 
     async execute(input: RegisterGameInput): Promise<void> {
-        const game = new Game(v4())
+        const game = new Game(
+            v4(),
+            input.name,
+            input.description,
+            input.rule,
+            input.minPlayers,
+            input.maxPlayers,
+            input.imageUrl,
+            input.frontendUrl,
+            input.backendUrl,
+        )
         game.register(input)
         await this.gameRepository.save(game)
         const events = game.getDomainEvents()

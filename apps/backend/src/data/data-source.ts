@@ -1,7 +1,7 @@
 import dotenv from 'dotenv'
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` })
 import { DataSource } from 'typeorm'
-import { GameData, RoomData } from '~/data/entity'
+import { GameData, RoomData, UserData } from '~/data/entity'
 import { ClearDatabaseFeatureToggle } from '~/feature-toggle'
 
 export const AppDataSource = new DataSource({
@@ -14,7 +14,7 @@ export const AppDataSource = new DataSource({
     synchronize: true,
     dropSchema: ClearDatabaseFeatureToggle.isEnabled(),
     logging: ['error'],
-    entities: [GameData, RoomData],
+    entities: [GameData, RoomData, UserData],
     subscribers: [],
     migrations: [],
     extra: {

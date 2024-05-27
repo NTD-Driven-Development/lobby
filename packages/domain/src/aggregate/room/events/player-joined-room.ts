@@ -1,11 +1,11 @@
 import { Player, RoomId } from '../entity'
 import { DomainEvent } from '../../../core/entity'
-import { PlayerJoinRoomCommandSchema } from '../command'
+import { JoinRoomCommandSchema } from '../command'
 import { RoomEvent } from './room-event'
 
 export type PlayerJoinedRoomSchema = {
     roomId: RoomId
-    user: Player
+    player: Player
 }
 
 export class PlayerJoinedRoom extends DomainEvent implements RoomEvent {
@@ -16,7 +16,7 @@ export class PlayerJoinedRoom extends DomainEvent implements RoomEvent {
 
 export type PlayerJoinedRoomEventSchema = PlayerJoinedRoom
 
-export type PlayerJoinRoomEventSchema = {
-    type: 'player-join-room'
-    data: PlayerJoinRoomCommandSchema
+export type JoinRoomEventSchema = {
+    type: 'join-room'
+    data: Omit<JoinRoomCommandSchema, 'playerId' | 'playerName'> & { roomId: RoomId }
 }
