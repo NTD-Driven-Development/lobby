@@ -7,12 +7,16 @@ import { RoomRepositoryImpl } from '../repository/room-repository-impl'
 import { RoomRepository } from '../repository/room-repository'
 import { UserRepository } from '~/user/repository/user-repository'
 import { UserRepositoryImpl } from '~/user/repository/user-repository-impl'
+import { GameRepository } from '~/game/repository/game-repository'
+import { GameRepositoryImpl } from '~/game/repository/game-repository-impl'
 
-export type CreateRoomInput = Omit<CreateRoomCommandSchema, 'players' | 'host'> & { email: string }
+export type CreateRoomInput = Omit<CreateRoomCommandSchema, 'players' | 'host' | 'game'> & { gameId: string; email: string }
 
 @autoInjectable()
 export class CreateRoomUseCase implements UseCase<CreateRoomInput, void> {
     constructor(
+        @inject(GameRepositoryImpl)
+        private gameRepository: GameRepository,
         @inject(RoomRepositoryImpl)
         private roomRepository: RoomRepository,
         @inject(UserRepositoryImpl)
@@ -22,6 +26,7 @@ export class CreateRoomUseCase implements UseCase<CreateRoomInput, void> {
     ) {}
 
     async execute(input: CreateRoomInput): Promise<void> {
+        const game = await this.gameRepository.findById(input.gameId)
         const room = new Room(v4())
         const user = await this.userRepository.findByEmail(input.email)
         const player = {
@@ -31,6 +36,12 @@ export class CreateRoomUseCase implements UseCase<CreateRoomInput, void> {
         }
         room.createRoom({
             ...input,
+            game: {
+                id: game.id,
+                name: game.name as string,
+                minPlayers: game.minPlayers as number,
+                maxPlayers: game.maxPlayers as number,
+            },
             host: player,
             players: [player],
         })

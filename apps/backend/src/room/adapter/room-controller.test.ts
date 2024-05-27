@@ -42,7 +42,7 @@ describe('socket on room-controller', () => {
     `, (done) => {
         // given
         givenGame(client, '大老二').then((game) => {
-            const givenData = givenCreateRoom(game, '123')
+            const givenData = givenCreateRoom(game.id, '123')
             client.emit('create-room', givenData)
             client.on('room-created', async (event) => {
                 // then
@@ -63,7 +63,7 @@ describe('socket on room-controller', () => {
         // given
         const { clientA, clientB } = givenTwoPlayersSocket()
         givenGame(clientA, '大老二').then((game) => {
-            clientA.emit('create-room', givenCreateRoom(game, '123'))
+            clientA.emit('create-room', givenCreateRoom(game.id, '123'))
             clientB.on('room-created', async (event) => {
                 const roomId = event.data.roomId
                 // B join A's room
@@ -93,7 +93,6 @@ describe('socket on room-controller', () => {
 function assertClientWasLeftRoom(client: Client, roomId: string) {
     return new Promise((resolve) =>
         client.on('player-left-room', (event) => {
-            console.log(event)
             expect(event.data).toEqual({
                 roomId,
                 playerId: expect.any(String),
@@ -299,12 +298,7 @@ function assertRoomCreatedSuccessfully(
         name: string
         minPlayers: number
         maxPlayers: number
-        game: {
-            id: string
-            name: string
-            minPlayers: number
-            maxPlayers: number
-        }
+        gameId: string
         password: string | null
     },
 ) {
@@ -312,7 +306,9 @@ function assertRoomCreatedSuccessfully(
         expect.objectContaining<RoomCreatedEventSchema['data']>({
             roomId: expect.any(String),
             name: givenData.name,
-            game: givenData.game,
+            game: expect.objectContaining({
+                id: givenData.gameId,
+            }),
             host: {
                 id: expect.any(String),
                 name: 'test',
@@ -336,15 +332,12 @@ function assertRoomCreatedSuccessfully(
     )
 }
 
-function givenCreateRoom(
-    gameInfo: { id: string; name: string; minPlayers: number; maxPlayers: number },
-    password: string | null = null,
-): CreateRoomEventSchema {
+function givenCreateRoom(gameId: string, password: string | null = null): CreateRoomEventSchema {
     return {
         type: 'create-room',
         data: {
             name: '快來一起玩吧~',
-            game: gameInfo,
+            gameId,
             minPlayers: 4,
             maxPlayers: 4,
             password,
