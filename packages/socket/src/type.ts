@@ -11,7 +11,7 @@ import {
     StartGameEventSchema,
     UpdateUserInfoEventSchema,
     RegisterUserEventSchema,
-    GetGamesEventSchema,
+    GetRoomsEventSchema,
     GetGamesResultEventSchema,
     GameInfoUpdatedEventSchema,
     GameRegisteredEventSchema,
@@ -25,11 +25,20 @@ import {
     RoomStartedGameEventSchema,
     UserInfoUpdatedEventSchema,
     UserRegisteredEventSchema,
+    GetGamesEventSchema,
+    GetRoomEventSchema,
+    GetRoomResultEventSchema,
+    GetRoomsResultEventSchema,
+    GetMyStatusEventSchema,
+    GetMyStatusResultEventSchema,
 } from '@packages/domain'
 import { Socket as BaseServer } from 'socket.io'
 import { Socket as BaseClient } from 'socket.io-client'
 
 interface ServerToClientEvents {
+    'get-my-status-result': (event: GetMyStatusResultEventSchema) => void
+    'get-room-result': (event: GetRoomResultEventSchema) => void
+    'get-rooms-result': (event: GetRoomsResultEventSchema) => void
     'get-games-result': (event: GetGamesResultEventSchema) => void
     'game-info-updated': (event: GameInfoUpdatedEventSchema) => void
     'game-registered': (event: GameRegisteredEventSchema) => void
@@ -46,6 +55,9 @@ interface ServerToClientEvents {
 }
 
 interface ClientToServerEvents {
+    'get-my-status': (event: GetMyStatusEventSchema) => void
+    'get-room': (event: GetRoomEventSchema) => void
+    'get-rooms': (event: GetRoomsEventSchema) => void
     'get-games': (event: GetGamesEventSchema) => void
     'update-game-info': (event: UpdateGameInfoEventSchema) => void
     'register-game': (event: RegisterGameEventSchema) => void
