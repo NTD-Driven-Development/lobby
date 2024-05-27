@@ -11,8 +11,8 @@ export class UserRepositoryImpl implements UserRepository {
     public constructor() {
         this.repo = AppDataSource.getRepository(UserData)
     }
-    existsUserByEmail(email: string): boolean {
-        throw new Error('Method not implemented.')
+    public async existsUserByEmail(email: string): Promise<boolean> {
+        return (await this.repo.count({ where: { email } })) > 0
     }
     findById(id: string): Promise<User> {
         throw new Error('Method not implemented.')
