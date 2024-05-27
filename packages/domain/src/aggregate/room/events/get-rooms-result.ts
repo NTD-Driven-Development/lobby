@@ -7,16 +7,13 @@ export type GetRoomsResultSchema = {
     name: string
     minPlayers: number
     maxPlayers: number
+    currentPlayers: number
     game: {
         id: string
         name: string
-        description: string
-        rule: string
         minPlayers: number
         maxPlayers: number
-        imageUrl: string | null
     }
-    currentPlayers: number
     isLocked: boolean
     status: RoomStatus
 }[]
