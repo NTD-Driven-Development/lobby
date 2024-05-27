@@ -3,12 +3,19 @@ import { RoomRepository } from './room-repository'
 import { Repository } from 'typeorm'
 import { RoomData } from '~/data/entity'
 import { AppDataSource } from '~/data/data-source'
-import { Room, RoomStatus, Game } from '@packages/domain'
+import { Room, RoomStatus, Game, Player } from '@packages/domain'
 
 @injectable()
 export class RoomRepositoryImpl implements RoomRepository {
     private repo: Repository<RoomData> = AppDataSource.getRepository(RoomData)
 
+    public async findNotClosed(): Promise<Room[]> {
+        return (
+            await this.repo.find({
+                where: { isClosed: false },
+            })
+        ).map(toDomain)
+    }
     public async findById(roomId: string): Promise<Room> {
         return toDomain(
             await this.repo.findOneOrFail({
@@ -58,8 +65,8 @@ function toDomain(data: RoomData) {
         data.id,
         data.name,
         data.game,
-        data.host,
-        data.players,
+        data.host as Player,
+        data.players as Player[],
         data.minPlayers,
         data.maxPlayers,
         data.createdAt,

@@ -1,4 +1,4 @@
-import { Room, CreateRoomCommandSchema, UseCase } from '@packages/domain'
+import { Room, CreateRoomCommandSchema, UseCase, PlayerStatus, Player } from '@packages/domain'
 import { v4 } from 'node-uuid'
 import { EventBus } from '~/eventbus/eventbus'
 import { WebSocketEventBus } from '~/eventbus/websocket-eventbus'
@@ -29,10 +29,11 @@ export class CreateRoomUseCase implements UseCase<CreateRoomInput, void> {
         const game = await this.gameRepository.findById(input.gameId)
         const room = new Room(v4())
         const user = await this.userRepository.findByEmail(input.email)
-        const player = {
+        const player: Player = {
             id: user.id,
             name: user.name,
             isReady: true,
+            status: PlayerStatus.CONNECTED,
         }
         room.createRoom({
             ...input,
