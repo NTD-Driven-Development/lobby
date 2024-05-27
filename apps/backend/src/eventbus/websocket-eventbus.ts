@@ -56,6 +56,7 @@ export class WebSocketEventBus implements EventBus {
                 this.socket.emit('room-started-game', event)
                 break
             case event instanceof PlayerJoinedRoom:
+                this.socket.join(event.data.roomId)
                 this.socket.in(event.data.roomId).emit('player-joined-room', event)
                 this.socket.emit('player-joined-room', event)
                 break

@@ -7,12 +7,14 @@ import { Room, RoomStatus, Game } from '@packages/domain'
 
 @injectable()
 export class RoomRepositoryImpl implements RoomRepository {
-    private repo: Repository<RoomData>
-    public constructor() {
-        this.repo = AppDataSource.getRepository(RoomData)
-    }
-    findById(roomId: string): Promise<Room> {
-        throw new Error('Method not implemented.')
+    private repo: Repository<RoomData> = AppDataSource.getRepository(RoomData)
+
+    public async findById(roomId: string): Promise<Room> {
+        return toDomain(
+            await this.repo.findOneOrFail({
+                where: { id: roomId },
+            }),
+        )
     }
     findByStatus(status: RoomStatus): Promise<Room[]> {
         throw new Error('Method not implemented.')
@@ -49,4 +51,21 @@ function toData(aggregate: Room) {
     data.isClosed = aggregate.isClosed as boolean
     data.gameUrl = aggregate.gameUrl
     return data
+}
+
+function toDomain(data: RoomData) {
+    return new Room(
+        data.id,
+        data.name,
+        data.game,
+        data.host,
+        data.players,
+        data.minPlayers,
+        data.maxPlayers,
+        data.createdAt,
+        data.status as RoomStatus,
+        data.password,
+        data.isClosed,
+        data.gameUrl,
+    )
 }

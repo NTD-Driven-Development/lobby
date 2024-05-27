@@ -1,5 +1,4 @@
-import { Room, CreateRoomCommandSchema, UseCase } from '@packages/domain'
-import { v4 } from 'node-uuid'
+import { UseCase, JoinRoomCommandSchema } from '@packages/domain'
 import { EventBus } from '~/eventbus/eventbus'
 import { WebSocketEventBus } from '~/eventbus/websocket-eventbus'
 import { autoInjectable, inject } from 'tsyringe'
@@ -8,10 +7,10 @@ import { RoomRepository } from '../repository/room-repository'
 import { UserRepository } from '~/user/repository/user-repository'
 import { UserRepositoryImpl } from '~/user/repository/user-repository-impl'
 
-export type CreateRoomInput = Omit<CreateRoomCommandSchema, 'players' | 'host'> & { email: string }
+export type JoinRoomInput = Omit<JoinRoomCommandSchema, 'playerName' | 'playerId'> & { email: string; roomId: string }
 
 @autoInjectable()
-export class CreateRoomUseCase implements UseCase<CreateRoomInput, void> {
+export class JoinRoomUseCase implements UseCase<JoinRoomInput, void> {
     constructor(
         @inject(RoomRepositoryImpl)
         private roomRepository: RoomRepository,
@@ -21,18 +20,13 @@ export class CreateRoomUseCase implements UseCase<CreateRoomInput, void> {
         private eventBus: EventBus,
     ) {}
 
-    async execute(input: CreateRoomInput): Promise<void> {
-        const room = new Room(v4())
-        const user = await this.userRepository.findByEmail(input.email)
-        const player = {
-            id: user.id,
-            name: user.name,
-            isReady: true,
-        }
-        room.createRoom({
-            ...input,
-            host: player,
-            players: [player],
+    async execute(input: JoinRoomInput): Promise<void> {
+        const room = await this.roomRepository.findById(input.roomId)
+        const player = await this.userRepository.findByEmail(input.email)
+        room.joinRoom({
+            playerId: player.id,
+            playerName: player.name,
+            password: input.password,
         })
         await this.roomRepository.save(room)
         const events = room.getDomainEvents()
