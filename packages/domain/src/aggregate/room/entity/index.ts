@@ -89,6 +89,13 @@ export class Room extends AggregateRoot<RoomId> {
                 break
             case event instanceof RoomChangedHost:
                 this.host = this.findPlayer(event.data.host) ?? this.host
+                this.host.isReady = true
+                this.players = this.players.map((player) => {
+                    if (player.id === event.data.host) {
+                        return { ...player, isReady: true }
+                    }
+                    return player
+                })
                 break
             case event instanceof PlayerJoinedRoom:
                 this.addPlayer(event.data.player)
