@@ -11,9 +11,9 @@ import {
     RoomChangedHost,
 } from '../events'
 import {
-    PlayerJoinRoomCommandSchema,
-    PlayerLeaveRoomCommandSchema,
-    ChangePlayerReadinessCommandSchema,
+    JoinRoomCommandSchema,
+    LeaveRoomCommandSchema,
+    ChangeReadinessCommandSchema,
     ChangeHostCommandSchema,
     CloseRoomCommandSchema,
     StartGameCommandSchema,
@@ -91,14 +91,14 @@ export class Room extends AggregateRoot<RoomId> {
                 this.host = this.findPlayer(event.data.host) ?? this.host
                 break
             case event instanceof PlayerJoinedRoom:
-                this.addPlayer(event.data.user)
+                this.addPlayer(event.data.player)
                 break
             case event instanceof PlayerLeftRoom:
-                this.removePlayer(event.data.userId)
+                this.removePlayer(event.data.playerId)
                 break
             case event instanceof PlayerReadinessChanged:
                 this.players.forEach((player) => {
-                    if (player.id === event.data.userId) {
+                    if (player.id === event.data.playerId) {
                         player.isReady = event.data.isReady
                     }
                 })
@@ -167,7 +167,7 @@ export class Room extends AggregateRoot<RoomId> {
         this.apply(new RoomClosed({ roomId: this.id, isClosed: true }))
     }
 
-    public joinRoom(payload: PlayerJoinRoomCommandSchema) {
+    public joinRoom(payload: JoinRoomCommandSchema) {
         if (this.isFull()) {
             throw new Error('The room is full')
         }
@@ -177,7 +177,7 @@ export class Room extends AggregateRoot<RoomId> {
         this.apply(
             new PlayerJoinedRoom({
                 roomId: this.id,
-                user: {
+                player: {
                     id: payload.playerId,
                     name: payload.playerName,
                     isReady: false,
@@ -186,12 +186,12 @@ export class Room extends AggregateRoot<RoomId> {
         )
     }
 
-    public leaveRoom(payload: PlayerLeaveRoomCommandSchema) {
+    public leaveRoom(payload: LeaveRoomCommandSchema) {
         const player = this.findPlayer(payload.playerId)
         if (!player) {
             throw new Error('Player not found')
         }
-        this.apply(new PlayerLeftRoom({ roomId: this.id, userId: player.id }))
+        this.apply(new PlayerLeftRoom({ roomId: this.id, playerId: player.id }))
         if (this.host.id === player.id) {
             this.apply(new RoomChangedHost({ roomId: this.id, host: this.players[0]?.id }))
         }
@@ -206,7 +206,7 @@ export class Room extends AggregateRoot<RoomId> {
         if (!player) {
             throw new Error('Player not found')
         }
-        this.apply(new PlayerLeftRoom({ roomId: this.id, userId: playerId }))
+        this.apply(new PlayerLeftRoom({ roomId: this.id, playerId: playerId }))
     }
 
     public findPlayer(playerId: PlayerId) {
@@ -219,7 +219,7 @@ export class Room extends AggregateRoot<RoomId> {
         }
     }
 
-    public changePlayerReadiness(payload: ChangePlayerReadinessCommandSchema) {
+    public changePlayerReadiness(payload: ChangeReadinessCommandSchema) {
         const player = this.players.find((player) => player.id === payload.playerId)
         if (!player) {
             throw new Error('Player not found')
@@ -227,7 +227,7 @@ export class Room extends AggregateRoot<RoomId> {
         this.apply(
             new PlayerReadinessChanged({
                 roomId: this.id,
-                userId: player.id,
+                playerId: player.id,
                 isReady: payload.isReady,
             }),
         )
@@ -261,7 +261,7 @@ export class Room extends AggregateRoot<RoomId> {
                 this.apply(
                     new PlayerReadinessChanged({
                         roomId: this.id,
-                        userId: player.id,
+                        playerId: player.id,
                         isReady: false,
                     }),
                 )

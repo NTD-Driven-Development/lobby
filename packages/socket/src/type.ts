@@ -1,9 +1,9 @@
 import {
     UpdateGameInfoEventSchema,
     RegisterGameEventSchema,
-    PlayerJoinRoomEventSchema,
-    PlayerLeaveRoomEventSchema,
-    ChangePlayerReadinessEventSchema,
+    JoinRoomEventSchema,
+    LeaveRoomEventSchema,
+    ChangeReadinessEventSchema,
     ChangeHostEventSchema,
     CreateRoomEventSchema,
     CloseRoomEventSchema,
@@ -49,9 +49,9 @@ interface ClientToServerEvents {
     'get-games': (event: GetGamesEventSchema) => void
     'update-game-info': (event: UpdateGameInfoEventSchema) => void
     'register-game': (event: RegisterGameEventSchema) => void
-    'join-room': (event: PlayerJoinRoomEventSchema) => void
-    'leave-room': (event: PlayerLeaveRoomEventSchema) => void
-    'change-readiness': (event: ChangePlayerReadinessEventSchema) => void
+    'join-room': (event: JoinRoomEventSchema) => void
+    'leave-room': (event: LeaveRoomEventSchema) => void
+    'change-readiness': (event: ChangeReadinessEventSchema) => void
     'change-host': (event: ChangeHostEventSchema) => void
     'close-room': (event: CloseRoomEventSchema) => void
     'create-room': (event: CreateRoomEventSchema) => void

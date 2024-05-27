@@ -1,5 +1,5 @@
 import { PlayerId } from '../entity'
 
-export type PlayerLeaveRoomCommandSchema = {
+export type LeaveRoomCommandSchema = {
     playerId: PlayerId
 }
