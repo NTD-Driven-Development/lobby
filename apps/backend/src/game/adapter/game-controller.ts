@@ -13,11 +13,7 @@ export class GameController {
         private updateGameInfoUseCase: UpdateGameInfoUseCase,
         @inject(GetGamesUseCase)
         private getGamesUseCase: GetGamesUseCase,
-    ) {
-        this.registerGameUseCase = registerGameUseCase
-        this.updateGameInfoUseCase = updateGameInfoUseCase
-        this.getGamesUseCase = getGamesUseCase
-    }
+    ) {}
 
     public async registerGame(event: RegisterGameEventSchema) {
         await this.registerGameUseCase.execute(event.data)

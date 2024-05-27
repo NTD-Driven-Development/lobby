@@ -2,6 +2,7 @@ import { Player, RoomGameSchema, RoomId, RoomStatus } from '../entity'
 import { DomainEvent } from '../../../core/entity/domain-event'
 import { CreateRoomCommandSchema } from '../command'
 import { RoomEvent } from './room-event'
+import { GameId } from '../../game'
 
 export type RoomCreatedSchema = {
     roomId: RoomId
@@ -28,5 +29,5 @@ export type RoomCreatedEventSchema = RoomCreated
 
 export type CreateRoomEventSchema = {
     type: 'create-room'
-    data: Omit<CreateRoomCommandSchema, 'host' | 'players'>
+    data: Omit<CreateRoomCommandSchema, 'host' | 'players' | 'game'> & { gameId: GameId }
 }

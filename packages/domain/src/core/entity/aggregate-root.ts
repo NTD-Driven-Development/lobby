@@ -40,6 +40,10 @@ export abstract class AggregateRoot<ID> implements Entity<ID> {
         return this.version
     }
 
+    public setVersion(version: number): void {
+        this.version = version
+    }
+
     protected abstract when(event: DomainEvent): void
 
     protected ensureInvariant(): void {}

@@ -1,6 +1,7 @@
-import { Entity, Column, BaseEntity, PrimaryColumn } from 'typeorm'
+import { Entity, Column, BaseEntity, PrimaryColumn, Unique } from 'typeorm'
 
 @Entity('game')
+@Unique('game_id_version', ['id', 'version'])
 export class GameData extends BaseEntity {
     @PrimaryColumn({ type: 'uuid', name: 'id' })
     id!: string
