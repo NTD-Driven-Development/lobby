@@ -27,7 +27,11 @@ export class User extends AggregateRoot<UserId> {
     }
 
     public changeName(name: string) {
-        this.apply(new UserInfoUpdated({ id: this.id, name }))
+        this.apply(
+            new UserInfoUpdated({ 
+                id: this.id, 
+                name 
+            }))
     }
 
     protected when(event: DomainEvent): void {
