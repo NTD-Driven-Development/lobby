@@ -10,13 +10,15 @@ import { UserController } from '~/user/adapter/user-controller'
 //     done()
 // }
 
-export const UserEventHandlers = (socket: Server) => {
+export const UserEventHandlers = async (socket: Server) => {
     const userController = container.resolve(UserController)
-    //使用者註冊事件
-    socket.on('register-user', async (event) => {
-        await userController.registerUser(event, socket.auth.user)
+    // 使用者註冊事件
+    // auto register user when socket connected
+    await userController.registerUser(socket.auth.user)
+    socket.on('register-user', async () => {
+        await userController.registerUser(socket.auth.user)
     })
-    //使用者更新個資事件
+    // 使用者更新個資事件
     socket.on('update-user-info', async (event) => {
         await userController.updateUserInfo(event, socket.auth.user)
     })

@@ -27,7 +27,7 @@ export class UserController {
         this.registerUserUseCase = registerUserUseCase
         this.updateUserInfoUseCase = updateUserInfoUseCase
     }
-    public async registerUser(event: RegisterUserEventSchema, user: Auth0User) {
+    public async registerUser(user: Auth0User) {
         await this.registerUserUseCase.execute({
             email: user.email,
             name: user.name,
