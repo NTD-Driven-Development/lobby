@@ -128,7 +128,7 @@ export class Room extends AggregateRoot<RoomId> {
     }
 
     isLocked() {
-        return this.password !== null
+        return this.password !== null && this.password !== ''
     }
 
     public createRoom(payload: CreateRoomCommandSchema) {
