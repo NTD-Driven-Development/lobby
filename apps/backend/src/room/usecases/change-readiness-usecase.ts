@@ -1,11 +1,8 @@
 import { UseCase, ChangeReadinessCommandSchema } from '@packages/domain'
-import { EventBus } from '~/eventbus/eventbus'
-import { WebSocketEventBus } from '~/eventbus/websocket-eventbus'
+import { EventBus, WebSocketEventBus } from '~/eventbus'
 import { autoInjectable, inject } from 'tsyringe'
-import { RoomRepositoryImpl } from '../repository/room-repository-impl'
-import { RoomRepository } from '../repository/room-repository'
-import { UserRepositoryImpl } from '~/user/repository/user-repository-impl'
-import { UserRepository } from '~/user/repository/user-repository'
+import { RoomRepository, RoomRepositoryImpl } from '~/room/repository'
+import { UserRepository, UserRepositoryImpl } from '~/user/repository'
 
 export type ChangeReadinessInput = Omit<ChangeReadinessCommandSchema, 'playerId'> & { email: string; roomId: string }
 
