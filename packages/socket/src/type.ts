@@ -52,6 +52,7 @@ interface ServerToClientEvents {
     'room-started-game': (event: RoomStartedGameEventSchema) => void
     'user-info-updated': (event: UserInfoUpdatedEventSchema) => void
     'user-registered': (event: UserRegisteredEventSchema) => void
+    'validation-error': (error: string) => void
 }
 
 interface ClientToServerEvents {
