@@ -188,6 +188,7 @@ export class Room extends AggregateRoot<RoomId> {
                     id: payload.playerId,
                     name: payload.playerName,
                     isReady: false,
+                    status: PlayerStatus.CONNECTED,
                 },
             }),
         )
@@ -282,8 +283,14 @@ export enum RoomStatus {
     PLAYING = 'PLAYING',
 }
 
+export enum PlayerStatus {
+    CONNECTED = 'CONNECTED',
+    DISCONNECTED = 'DISCONNECTED',
+}
+
 export type Player = {
     id: Readonly<PlayerId>
     name: Readonly<string>
     isReady: boolean
+    status: PlayerStatus
 }

@@ -21,6 +21,7 @@ export class RoomData extends BaseEntity {
         id: string
         name: string
         isReady: boolean
+        status: 'CONNECTED' | 'DISCONNECTED'
     }
 
     @Column({ type: 'jsonb', nullable: true })
@@ -28,6 +29,7 @@ export class RoomData extends BaseEntity {
         id: string
         name: string
         isReady: boolean
+        status: 'CONNECTED' | 'DISCONNECTED'
     }[]
 
     @Column({ type: 'int' })
@@ -36,7 +38,7 @@ export class RoomData extends BaseEntity {
     @Column({ type: 'int' })
     maxPlayers!: number
 
-    @Column({ type: 'date' })
+    @Column({ type: 'timestamp' })
     createdAt!: Date
 
     @Column({ type: 'enum', enum: ['WAITING', 'PLAYING'], unique: false })

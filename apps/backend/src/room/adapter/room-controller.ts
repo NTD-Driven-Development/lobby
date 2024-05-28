@@ -1,11 +1,20 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ChangeReadinessEventSchema, CreateRoomEventSchema, JoinRoomEventSchema, LeaveRoomEventSchema } from '@packages/domain'
+import {
+    ChangeReadinessEventSchema,
+    CreateRoomEventSchema,
+    GetRoomEventSchema,
+    GetRoomsEventSchema,
+    JoinRoomEventSchema,
+    LeaveRoomEventSchema,
+} from '@packages/domain'
 import { autoInjectable, inject } from 'tsyringe'
 import { Auth0User } from '~/middleware/socket-auth0'
 import { CreateRoomUseCase } from '../usecases/create-room-usecase'
 import { JoinRoomUseCase } from '../usecases/join-room-usecase'
 import { ChangeReadinessUseCase } from '../usecases/change-readiness-usecase'
 import { LeaveRoomUseCase } from '../usecases/leave-room-usecase'
+import { GetRoomUseCase } from '../usecases/get-room-usecase'
+import { GetRoomsUseCase } from '../usecases/get-rooms-usecase'
 
 // @autoInjectable()
 // export class RoomController {
@@ -25,6 +34,10 @@ export class RoomController {
         private changeReadinessUseCase: ChangeReadinessUseCase,
         @inject(LeaveRoomUseCase)
         private leaveRoomUseCase: LeaveRoomUseCase,
+        @inject(GetRoomUseCase)
+        private getRoomUseCase: GetRoomUseCase,
+        @inject(GetRoomsUseCase)
+        private getRoomsUseCase: GetRoomsUseCase,
     ) {}
     public async createRoom(event: CreateRoomEventSchema, user: Readonly<Auth0User>) {
         await this.createRoomUseCase.execute({
@@ -51,6 +64,18 @@ export class RoomController {
         await this.leaveRoomUseCase.execute({
             ...event.data,
             email: user.email,
+        })
+    }
+
+    public async getRoom(event: GetRoomEventSchema, user: Readonly<Auth0User>) {
+        return await this.getRoomUseCase.execute({
+            ...event.data,
+        })
+    }
+
+    public async getRooms(event: GetRoomsEventSchema, user: Readonly<Auth0User>) {
+        return await this.getRoomsUseCase.execute({
+            ...event.data,
         })
     }
 }

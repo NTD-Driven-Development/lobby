@@ -1,6 +1,7 @@
 import { AbstractRepository, Game, PlayerId, Room, RoomId, RoomStatus } from '@packages/domain'
 
 export interface RoomRepository extends AbstractRepository<Room, RoomId> {
+    findNotClosed(): Promise<Room[]>
     findById(roomId: RoomId): Promise<Room>
     findByStatus(status: RoomStatus): Promise<Room[]>
     findWaitingPublicRoomsByGame(game: Game): Promise<Room[]>

@@ -1,3 +1,5 @@
+export * from './get-rooms-result'
+export * from './get-room-result'
 export * from './player-joined-room'
 export * from './player-left-room'
 export * from './player-readiness-changed'

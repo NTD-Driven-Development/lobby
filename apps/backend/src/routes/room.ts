@@ -23,4 +23,10 @@ export const RoomEventHandlers = (socket: Server) => {
     socket.on('leave-room', async (event) => {
         await roomController.leaveRoom(event, socket.auth.user)
     })
+    socket.on('get-room', async (event) => {
+        socket.emit('get-room-result', await roomController.getRoom(event, socket.auth.user))
+    })
+    socket.on('get-rooms', async (event) => {
+        socket.emit('get-rooms-result', await roomController.getRooms(event, socket.auth.user))
+    })
 }
