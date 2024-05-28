@@ -38,7 +38,7 @@ export class RoomData extends BaseEntity {
     @Column({ type: 'int' })
     maxPlayers!: number
 
-    @Column({ type: 'timestamp' })
+    @Column({ type: 'timestamp', name: 'created_at', default: () => 'CURRENT_TIMESTAMP', nullable: true })
     createdAt!: Date
 
     @Column({ type: 'enum', enum: ['WAITING', 'PLAYING'], unique: false })
