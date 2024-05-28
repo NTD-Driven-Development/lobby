@@ -1,5 +1,5 @@
 import { injectable } from 'tsyringe'
-import { RoomRepository } from './room-repository'
+import { RoomRepository } from '~/room/repository/room-repository'
 import { Repository } from 'typeorm'
 import { RoomData } from '~/data/entity'
 import { AppDataSource } from '~/data/data-source'

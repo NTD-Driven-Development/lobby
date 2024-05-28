@@ -1,7 +1,6 @@
 import { GetRoomsQuerySchema, GetRoomsResult, UseCase } from '@packages/domain'
 import { autoInjectable, inject } from 'tsyringe'
-import { RoomRepositoryImpl } from '../repository/room-repository-impl'
-import { RoomRepository } from '../repository/room-repository'
+import { RoomRepository, RoomRepositoryImpl } from '~/room/repository'
 
 export type GetRoomsInput = GetRoomsQuerySchema
 export type GetRoomsOutput = GetRoomsResult

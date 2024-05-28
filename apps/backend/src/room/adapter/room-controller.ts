@@ -8,17 +8,20 @@ import {
     LeaveRoomEventSchema,
 } from '@packages/domain'
 import { autoInjectable, inject } from 'tsyringe'
-import { Auth0User } from '~/middleware/socket-auth0'
-import { CreateRoomUseCase } from '../usecases/create-room-usecase'
-import { JoinRoomUseCase } from '../usecases/join-room-usecase'
-import { ChangeReadinessUseCase } from '../usecases/change-readiness-usecase'
-import { LeaveRoomUseCase } from '../usecases/leave-room-usecase'
-import { GetRoomUseCase } from '../usecases/get-room-usecase'
-import { GetRoomsUseCase } from '../usecases/get-rooms-usecase'
+import { Auth0User } from '~/middlewares/socket-auth0'
+import {
+    CreateRoomUseCase,
+    JoinRoomUseCase,
+    ChangeReadinessUseCase,
+    LeaveRoomUseCase,
+    GetRoomUseCase,
+    GetRoomsUseCase,
+} from '~/room/usecases'
 import { Server } from '@packages/socket'
 import { SocketThrow } from '~/decorators/socket-throw'
 import { Socket } from 'socket.io'
 
+// import { FastifyReply, FastifyRequest } from 'fastify'
 // @autoInjectable()
 // export class RoomController {
 //     public async getRooms(request: FastifyRequest, reply: FastifyReply) {

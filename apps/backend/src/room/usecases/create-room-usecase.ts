@@ -1,14 +1,10 @@
 import { Room, CreateRoomCommandSchema, UseCase, PlayerStatus, Player } from '@packages/domain'
 import { v4 } from 'node-uuid'
-import { EventBus } from '~/eventbus/eventbus'
-import { WebSocketEventBus } from '~/eventbus/websocket-eventbus'
+import { EventBus, WebSocketEventBus } from '~/eventbus'
 import { autoInjectable, inject } from 'tsyringe'
-import { RoomRepositoryImpl } from '../repository/room-repository-impl'
-import { RoomRepository } from '../repository/room-repository'
-import { UserRepository } from '~/user/repository/user-repository'
-import { UserRepositoryImpl } from '~/user/repository/user-repository-impl'
-import { GameRepository } from '~/game/repository/game-repository'
-import { GameRepositoryImpl } from '~/game/repository/game-repository-impl'
+import { RoomRepository, RoomRepositoryImpl } from '~/room/repository'
+import { UserRepository, UserRepositoryImpl } from '~/user/repository'
+import { GameRepository, GameRepositoryImpl } from '~/game/repository'
 
 export type CreateRoomInput = Omit<CreateRoomCommandSchema, 'players' | 'host' | 'game'> & { gameId: string; email: string }
 

@@ -1,9 +1,7 @@
 import { GetMyStatusResult, UseCase } from '@packages/domain'
 import { autoInjectable, inject } from 'tsyringe'
-import { UserRepository } from '~/user/repository/user-repository'
-import { UserRepositoryImpl } from '~/user/repository/user-repository-impl'
-import { RoomRepositoryImpl } from '~/room/repository/room-repository-impl'
-import { RoomRepository } from '~/room/repository/room-repository'
+import { UserRepository, UserRepositoryImpl } from '~/user/repository'
+import { RoomRepository, RoomRepositoryImpl } from '~/room/repository'
 
 export type GetMyStatusInput = { email: string }
 

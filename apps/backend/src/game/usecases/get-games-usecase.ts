@@ -1,7 +1,6 @@
 import { GetGamesQuerySchema, GetGamesResult, UseCase } from '@packages/domain'
-import { GameRepository } from '~/game/repository/game-repository'
 import { autoInjectable, inject } from 'tsyringe'
-import { GameRepositoryImpl } from '~/game/repository/game-repository-impl'
+import { GameRepository, GameRepositoryImpl } from '~/game/repository'
 
 export type GetGameInput = GetGamesQuerySchema
 export type GetGameOutput = GetGamesResult
