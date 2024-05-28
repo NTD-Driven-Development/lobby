@@ -104,29 +104,60 @@ describe('socket on room-controller', () => {
     it(`
         A, D 兩位玩家建立了大老二遊戲房間，
         D 加入 A 的房間，
-        加入失敗，只能加入一個房間
+        加入失敗，只能加入一個房間。
+        A 建立第二個大老二遊戲房間，
+        建立失敗，只能建立一個房間。
     `, (done) => {
         // given
         const { clientA, clientD } = givenFourPlayersSocket()
         givenGame(clientA, '大老二').then((game) => {
             clientA.emit('create-room', givenCreateRoom(game.id, null, 'A'))
-            clientA.on('room-created', async (event) => {
-                clientA.off('room-created')
-                const roomId = event.data.roomId
-                clientD.emit('create-room', givenCreateRoom(game.id, null, 'D'))
-                // D join A's room
-                clientD.on('room-created', async (event) => {
-                    clientD.emit('join-room', givenJoinRoom(roomId))
-                    clientD.on('validation-error', (error) => {
-                        console.log('error', error)
-                        expect(error).toBe('Player has already joined a room')
-                        done()
-                    })
+            assertCannotJoinSecondRoom(clientA, game, clientD).then(() => {
+                clientA.emit('create-room', givenCreateRoom(game.id, null, 'A2'))
+                clientA.on('validation-error', (error) => {
+                    expect(error).toBe('Player has already joined a room')
+                    done()
                 })
             })
         })
     })
 })
+
+async function assertCannotJoinSecondRoom(
+    clientA: Client,
+    game: {
+        id: string
+        name: string
+        description: string
+        rule: string
+        minPlayers: number
+        maxPlayers: number
+        imageUrl: string | null
+        frontendUrl: string
+        backendUrl: string
+        status: GameStatus
+    },
+    clientD: Client,
+) {
+    return Promise.all([
+        new Promise((resolve) => {
+            clientA.on('room-created', (event) => {
+                clientA.off('room-created')
+                const roomId = event.data.roomId
+                clientD.emit('create-room', givenCreateRoom(game.id, null, 'D'))
+                // D join A's room
+                clientD.on('room-created', () => {
+                    clientD.off('room-created')
+                    clientD.emit('join-room', givenJoinRoom(roomId))
+                    clientD.on('validation-error', (error) => {
+                        expect(error).toBe('Player has already joined a room')
+                        resolve(true)
+                    })
+                })
+            })
+        }),
+    ])
+}
 
 function assertClientBGetCurrentRoomData(
     client: Client,

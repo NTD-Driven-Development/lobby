@@ -26,9 +26,12 @@ export class CreateRoomUseCase implements UseCase<CreateRoomInput, void> {
     ) {}
 
     async execute(input: CreateRoomInput): Promise<void> {
+        const user = await this.userRepository.findByEmail(input.email)
+        if (await this.roomRepository.hasPlayerJoinedRoom(user.id)) {
+            throw new Error('Player has already joined a room')
+        }
         const game = await this.gameRepository.findById(input.gameId)
         const room = new Room(v4())
-        const user = await this.userRepository.findByEmail(input.email)
         const player: Player = {
             id: user.id,
             name: user.name,

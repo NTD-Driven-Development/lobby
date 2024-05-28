@@ -13,7 +13,11 @@ import { RoomController } from '~/room/adapter/room-controller'
 export const RoomEventHandlers = (socket: Server) => {
     const roomController = container.resolve(RoomController)
     socket.on('create-room', async (event) => {
-        await roomController.createRoom(event, socket.auth.user)
+        try {
+            await roomController.createRoom(event, socket.auth.user)
+        } catch (error: any) {
+            socket.emit('validation-error', error.message)
+        }
     })
     socket.on('join-room', async (event) => {
         try {
