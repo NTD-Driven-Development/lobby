@@ -61,10 +61,11 @@ describe('socket on room-controller', () => {
         玩家 C 透過房間列表加入 B 的房間，
     `, (done) => {
         // given
-        const { clientA, clientB, clientC } = givenThreePlayersSocket()
+        const { clientA, clientB, clientC } = givenFourPlayersSocket()
         givenGame(clientA, '大老二').then((game) => {
             clientA.emit('create-room', givenCreateRoom(game.id, '123'))
             clientB.on('room-created', async (event) => {
+                clientB.off('room-created')
                 const roomId = event.data.roomId
                 // B join A's room
                 clientB.emit('join-room', givenJoinRoom(roomId, '123'))
@@ -95,6 +96,32 @@ describe('socket on room-controller', () => {
                     clientC.emit('join-room', givenJoinRoom(room?.id as string, '123'))
                     await assertClientBWasJoinedRoom(clientB, clientC, 'C')
                     done()
+                })
+            })
+        })
+    })
+
+    it(`
+        A, D 兩位玩家建立了大老二遊戲房間，
+        D 加入 A 的房間，
+        加入失敗，只能加入一個房間
+    `, (done) => {
+        // given
+        const { clientA, clientD } = givenFourPlayersSocket()
+        givenGame(clientA, '大老二').then((game) => {
+            clientA.emit('create-room', givenCreateRoom(game.id, null, 'A'))
+            clientA.on('room-created', async (event) => {
+                clientA.off('room-created')
+                const roomId = event.data.roomId
+                clientD.emit('create-room', givenCreateRoom(game.id, null, 'D'))
+                // D join A's room
+                clientD.on('room-created', async (event) => {
+                    clientD.emit('join-room', givenJoinRoom(roomId))
+                    clientD.on('validation-error', (error) => {
+                        console.log('error', error)
+                        expect(error).toBe('Player has already joined a room')
+                        done()
+                    })
                 })
             })
         })
@@ -240,7 +267,7 @@ function givenJoinRoom(roomId: string, password: string | null = null) {
     }
 }
 
-function givenThreePlayersSocket() {
+function givenFourPlayersSocket() {
     const clientA: Client = io(globalThis.SOCKET_URL, {
         reconnectionDelayMax: 0,
         reconnectionDelay: 0,
@@ -271,7 +298,17 @@ function givenThreePlayersSocket() {
             name: 'C',
         },
     })
-    return { clientA, clientB, clientC }
+    const clientD: Client = io(globalThis.SOCKET_URL, {
+        reconnectionDelayMax: 0,
+        reconnectionDelay: 0,
+        forceNew: true,
+        transports: ['websocket'],
+        auth: {
+            email: 'd@gmail.com',
+            name: 'D',
+        },
+    })
+    return { clientA, clientB, clientC, clientD }
 }
 
 async function givenGame(client: Client, name: string) {
@@ -308,7 +345,7 @@ function setUp(done: jest.DoneCallback) {
     })
 
     // Create two players
-    const { clientA, clientB, clientC } = givenThreePlayersSocket()
+    const { clientA, clientB, clientC, clientD } = givenFourPlayersSocket()
 
     Promise.all([
         new Promise((resolve) => {
@@ -357,6 +394,14 @@ function setUp(done: jest.DoneCallback) {
             clientC.on('connect', () => {
                 clientC.emit('register-user', { type: 'register-user', data: null })
                 clientC.on('user-registered', () => {
+                    resolve(true)
+                })
+            })
+        }),
+        new Promise((resolve) => {
+            clientD.on('connect', () => {
+                clientD.emit('register-user', { type: 'register-user', data: null })
+                clientD.on('user-registered', () => {
                     resolve(true)
                 })
             })
@@ -411,11 +456,11 @@ function assertRoomCreatedSuccessfully(
     )
 }
 
-function givenCreateRoom(gameId: string, password: string | null = null): CreateRoomEventSchema {
+function givenCreateRoom(gameId: string, password: string | null = null, roomName: string | null = ''): CreateRoomEventSchema {
     return {
         type: 'create-room',
         data: {
-            name: '快來一起玩吧~',
+            name: `快來一起玩吧~${roomName}`,
             gameId,
             minPlayers: 4,
             maxPlayers: 4,

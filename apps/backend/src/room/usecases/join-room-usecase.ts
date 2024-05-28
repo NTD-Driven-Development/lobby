@@ -21,8 +21,11 @@ export class JoinRoomUseCase implements UseCase<JoinRoomInput, void> {
     ) {}
 
     async execute(input: JoinRoomInput): Promise<void> {
-        const room = await this.roomRepository.findById(input.roomId)
         const player = await this.userRepository.findByEmail(input.email)
+        if (await this.roomRepository.hasPlayerJoinedRoom(player.id)) {
+            throw new Error('Player has already joined a room')
+        }
+        const room = await this.roomRepository.findById(input.roomId)
         room.joinRoom({
             playerId: player.id,
             playerName: player.name,

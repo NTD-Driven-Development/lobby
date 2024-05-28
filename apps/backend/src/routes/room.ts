@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Server } from '@packages/socket'
 import { container } from 'tsyringe'
@@ -15,7 +16,11 @@ export const RoomEventHandlers = (socket: Server) => {
         await roomController.createRoom(event, socket.auth.user)
     })
     socket.on('join-room', async (event) => {
-        await roomController.joinRoom(event, socket.auth.user)
+        try {
+            await roomController.joinRoom(event, socket.auth.user)
+        } catch (error: any) {
+            socket.emit('validation-error', error.message)
+        }
     })
     socket.on('change-readiness', async (event) => {
         await roomController.changeReadiness(event, socket.auth.user)
