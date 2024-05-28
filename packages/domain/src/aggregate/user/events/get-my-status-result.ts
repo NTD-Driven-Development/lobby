@@ -1,6 +1,9 @@
 import { DomainEvent } from '../../../core/entity'
 
 export type GetMyStatusResultSchema = {
+    id: string
+    email: string
+    name: string
     roomId: string | null
 }
 
@@ -10,7 +13,7 @@ export class GetMyStatusResult extends DomainEvent {
     }
 }
 
-export type GetMyStatusResultEventSchema = GetMyStatusResultSchema
+export type GetMyStatusResultEventSchema = GetMyStatusResult
 
 export type GetMyStatusEventSchema = {
     type: 'get-my-status'
