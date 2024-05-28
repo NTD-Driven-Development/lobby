@@ -96,9 +96,12 @@ describe('socket on user-controller', () => {
                     data: null,
                 })
                 // then
-                client.on('get-my-status-result', (data) => {
-                    expect(data).toEqual(
+                client.on('get-my-status-result', (event) => {
+                    expect(event.data).toEqual(
                         expect.objectContaining({
+                            id: expect.any(String),
+                            email: 'test@example.com',
+                            name: '小明',
                             roomId: roomId,
                         }),
                     )
