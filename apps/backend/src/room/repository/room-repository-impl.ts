@@ -14,14 +14,14 @@ export class RoomRepositoryImpl implements RoomRepository {
             await this.repo.find({
                 where: { isClosed: false },
             })
-        ).map(toDomain)
+        ).map(toDomain) as Room[]
     }
     public async findById(roomId: string): Promise<Room> {
         return toDomain(
             await this.repo.findOneOrFail({
                 where: { id: roomId },
             }),
-        )
+        ) as Room
     }
     findByStatus(status: RoomStatus): Promise<Room[]> {
         throw new Error('Method not implemented.')
@@ -47,6 +47,16 @@ export class RoomRepositoryImpl implements RoomRepository {
     delete(room: Room): Promise<void> {
         throw new Error('Method not implemented.')
     }
+    public async findPlayerInNotClosedRoom(playerId: string): Promise<Room | null> {
+        return toDomain(
+            (
+                await this.repo.query(`
+                    SELECT * FROM room
+                    WHERE "players" @> '[{"id":"${playerId}"}]' and "isClosed" = false
+                `)
+            )[0],
+        )
+    }
 }
 
 function toData(aggregate: Room) {
@@ -66,7 +76,10 @@ function toData(aggregate: Room) {
     return data
 }
 
-function toDomain(data: RoomData) {
+function toDomain(data: RoomData | null) {
+    if (!data) {
+        return null
+    }
     return new Room(
         data.id,
         data.name,
