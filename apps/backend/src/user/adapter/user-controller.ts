@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { RegisterUserEventSchema , UpdateUserInfoEventSchema} from '@packages/domain'
+import { RegisterUserEventSchema, UpdateUserInfoEventSchema } from '@packages/domain'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { autoInjectable, inject } from 'tsyringe'
 import { Auth0User } from '~/middleware/socket-auth0'
 import { RegisterUserUseCase } from '../usecases/register-user-usecase'
 import { UpdateUserInfoUseCase } from '../usecases/update-user-info-usecase'
+import { GetMyStatusUseCase } from '../usecases/get-my-status-usecase'
 
 // @autoInjectable()
 // export class UserController {
@@ -20,6 +21,8 @@ export class UserController {
         private registerUserUseCase: RegisterUserUseCase,
         @inject(UpdateUserInfoUseCase)
         private updateUserInfoUseCase: UpdateUserInfoUseCase,
+        @inject(GetMyStatusUseCase)
+        private getMyStatusUseCase: GetMyStatusUseCase,
     ) {
         this.registerUserUseCase = registerUserUseCase
         this.updateUserInfoUseCase = updateUserInfoUseCase
@@ -36,5 +39,9 @@ export class UserController {
             email: user.email,
             name: event.data?.name,
         })
+    }
+
+    public async getMyStatus(user: Readonly<Auth0User>) {
+        return await this.getMyStatusUseCase.execute({ email: user.email })
     }
 }

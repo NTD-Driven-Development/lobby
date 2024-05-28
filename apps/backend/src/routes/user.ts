@@ -20,4 +20,7 @@ export const UserEventHandlers = (socket: Server) => {
     socket.on('update-user-info', async (event) => {
         await userController.updateUserInfo(event, socket.auth.user)
     })
+    socket.on('get-my-status', async () => {
+        socket.emit('get-my-status-result', await userController.getMyStatus(socket.auth.user))
+    })
 }

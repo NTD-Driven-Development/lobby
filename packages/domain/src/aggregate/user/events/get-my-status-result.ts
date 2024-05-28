@@ -10,7 +10,7 @@ export class GetMyStatusResult extends DomainEvent {
     }
 }
 
-export type GetMyStatusResultEventSchema = GetMyStatusResult
+export type GetMyStatusResultEventSchema = GetMyStatusResultSchema
 
 export type GetMyStatusEventSchema = {
     type: 'get-my-status'
