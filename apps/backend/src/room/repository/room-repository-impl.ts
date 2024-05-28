@@ -33,12 +33,10 @@ export class RoomRepositoryImpl implements RoomRepository {
         throw new Error('Method not implemented.')
     }
     public async hasPlayerJoinedRoom(playerId: string): Promise<boolean> {
-        console.log('playerId', playerId)
         const count = await this.repo.query(`
             SELECT COUNT(*) as cnt 
             FROM room WHERE "players" @> '[{"id": "${playerId}"}]' and "isClosed" = false
         `)
-        console.log('count', count)
         return count[0]['cnt'] > 0
     }
     public async save(aggregate: Room): Promise<void> {
