@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { RegisterUserEventSchema , UpdateUserInfoEventSchema} from '@packages/domain'
+import { RegisterUserEventSchema, UpdateUserInfoEventSchema } from '@packages/domain'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { autoInjectable, inject } from 'tsyringe'
 import { Auth0User } from '~/middleware/socket-auth0'
