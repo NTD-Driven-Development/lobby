@@ -6,6 +6,9 @@ import { Auth0User } from '~/middleware/socket-auth0'
 import { RegisterUserUseCase } from '../usecases/register-user-usecase'
 import { UpdateUserInfoUseCase } from '../usecases/update-user-info-usecase'
 import { GetMyStatusUseCase } from '../usecases/get-my-status-usecase'
+import { SocketThrow } from '~/decorators/socket-throw'
+import { Socket } from 'socket.io'
+import { Server } from '@packages/socket'
 
 // @autoInjectable()
 // export class UserController {
@@ -17,16 +20,17 @@ import { GetMyStatusUseCase } from '../usecases/get-my-status-usecase'
 @autoInjectable()
 export class UserController {
     constructor(
+        @inject(Socket)
+        private socket: Server,
         @inject(RegisterUserUseCase)
         private registerUserUseCase: RegisterUserUseCase,
         @inject(UpdateUserInfoUseCase)
         private updateUserInfoUseCase: UpdateUserInfoUseCase,
         @inject(GetMyStatusUseCase)
         private getMyStatusUseCase: GetMyStatusUseCase,
-    ) {
-        this.registerUserUseCase = registerUserUseCase
-        this.updateUserInfoUseCase = updateUserInfoUseCase
-    }
+    ) {}
+
+    @SocketThrow
     public async registerUser(user: Auth0User) {
         await this.registerUserUseCase.execute({
             email: user.email,
@@ -34,6 +38,7 @@ export class UserController {
         })
     }
 
+    @SocketThrow
     public async updateUserInfo(event: UpdateUserInfoEventSchema, user: Auth0User) {
         await this.updateUserInfoUseCase.execute({
             email: user.email,
@@ -41,6 +46,7 @@ export class UserController {
         })
     }
 
+    @SocketThrow
     public async getMyStatus(user: Readonly<Auth0User>) {
         return await this.getMyStatusUseCase.execute({ email: user.email })
     }

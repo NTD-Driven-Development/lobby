@@ -3,10 +3,15 @@ import { RegisterGameUseCase } from '~/game/usecases/register-game-usecase'
 import { UpdateGameInfoUseCase } from '~/game/usecases/update-game-info-usecase'
 import { GetGamesEventSchema, RegisterGameEventSchema, UpdateGameInfoEventSchema } from '@packages/domain'
 import { GetGamesUseCase } from '../usecases/get-games-usecase'
+import { Server } from '@packages/socket'
+import { Socket } from 'socket.io'
+import { SocketThrow } from '~/decorators/socket-throw'
 
 @autoInjectable()
 export class GameController {
     constructor(
+        @inject(Socket)
+        private socket: Server,
         @inject(RegisterGameUseCase)
         private registerGameUseCase: RegisterGameUseCase,
         @inject(UpdateGameInfoUseCase)
@@ -15,14 +20,17 @@ export class GameController {
         private getGamesUseCase: GetGamesUseCase,
     ) {}
 
+    @SocketThrow
     public async registerGame(event: RegisterGameEventSchema) {
         await this.registerGameUseCase.execute(event.data)
     }
 
+    @SocketThrow
     public async updateGameInfo(event: UpdateGameInfoEventSchema) {
         await this.updateGameInfoUseCase.execute(event.data)
     }
 
+    @SocketThrow
     public async getGames(event: GetGamesEventSchema) {
         return await this.getGamesUseCase.execute(event.data)
     }
