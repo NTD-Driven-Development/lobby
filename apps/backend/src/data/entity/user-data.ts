@@ -8,7 +8,7 @@ export class UserData extends BaseEntity {
     @Column({ type: 'varchar', name: 'name' })
     name!: string
 
-    @Column({ type: 'varchar', name: 'email' , unique: true })
+    @Column({ type: 'varchar', name: 'email', unique: true })
     email!: string
 
     @Column({ type: 'timestamp', name: 'created_at', default: 'now()' })
