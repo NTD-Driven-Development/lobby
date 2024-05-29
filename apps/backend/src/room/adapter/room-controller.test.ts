@@ -381,10 +381,7 @@ function setUp(done: jest.DoneCallback) {
     Promise.all([
         new Promise((resolve) => {
             client.on('connect', () => {
-                client.emit('register-user', { type: 'register-user', data: null })
-                client.on('user-registered', () => {
-                    resolve(true)
-                })
+                resolve(true)
             })
         }),
         new Promise((resolve) => {
@@ -407,40 +404,30 @@ function setUp(done: jest.DoneCallback) {
         }),
         new Promise((resolve) => {
             clientA.on('connect', () => {
-                clientA.emit('register-user', { type: 'register-user', data: null })
-                clientA.on('user-registered', () => {
-                    resolve(true)
-                })
+                resolve(true)
             })
         }),
         new Promise((resolve) => {
             clientB.on('connect', () => {
-                clientB.emit('register-user', { type: 'register-user', data: null })
-                clientB.on('user-registered', () => {
-                    resolve(true)
-                })
+                resolve(true)
             })
         }),
         new Promise((resolve) => {
             clientC.on('connect', () => {
-                clientC.emit('register-user', { type: 'register-user', data: null })
-                clientC.on('user-registered', () => {
-                    resolve(true)
-                })
+                resolve(true)
             })
         }),
         new Promise((resolve) => {
             clientD.on('connect', () => {
-                clientD.emit('register-user', { type: 'register-user', data: null })
-                clientD.on('user-registered', () => {
-                    resolve(true)
-                })
+                resolve(true)
             })
         }),
     ]).then(() => {
         client.disconnect()
         clientA.disconnect()
         clientB.disconnect()
+        clientC.disconnect()
+        clientD.disconnect()
         done()
     })
 }
