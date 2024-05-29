@@ -27,11 +27,13 @@ export class User extends AggregateRoot<UserId> {
     }
 
     public changeName(name: string) {
+        if (name == null || name == '') throw new Error('name can not be null or empty')
         this.apply(
-            new UserInfoUpdated({ 
-                id: this.id, 
-                name 
-            }))
+            new UserInfoUpdated({
+                id: this.id,
+                name,
+            }),
+        )
     }
 
     protected when(event: DomainEvent): void {

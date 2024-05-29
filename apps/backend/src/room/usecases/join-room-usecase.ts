@@ -1,11 +1,8 @@
 import { UseCase, JoinRoomCommandSchema } from '@packages/domain'
-import { EventBus } from '~/eventbus/eventbus'
-import { WebSocketEventBus } from '~/eventbus/websocket-eventbus'
+import { EventBus, WebSocketEventBus } from '~/eventbus'
 import { autoInjectable, inject } from 'tsyringe'
-import { RoomRepositoryImpl } from '../repository/room-repository-impl'
-import { RoomRepository } from '../repository/room-repository'
-import { UserRepository } from '~/user/repository/user-repository'
-import { UserRepositoryImpl } from '~/user/repository/user-repository-impl'
+import { RoomRepository, RoomRepositoryImpl } from '~/room/repository'
+import { UserRepository, UserRepositoryImpl } from '~/user/repository'
 
 export type JoinRoomInput = Omit<JoinRoomCommandSchema, 'playerName' | 'playerId'> & { email: string; roomId: string }
 

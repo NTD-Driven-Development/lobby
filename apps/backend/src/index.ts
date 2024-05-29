@@ -8,7 +8,7 @@ import { GameEventHandlers, RoomEventHandlers, UserEventHandlers } from '~/route
 import { Server } from '@packages/socket'
 import { Socket } from 'socket.io'
 import { container } from 'tsyringe'
-import { auth0Middleware } from '~/middleware/socket-auth0'
+import { auth0Middleware } from '~/middlewares'
 import { AppDataSource } from './data/data-source'
 ;(async () => {
     try {

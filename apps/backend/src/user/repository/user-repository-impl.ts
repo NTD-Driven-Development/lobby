@@ -1,5 +1,5 @@
 import { injectable } from 'tsyringe'
-import { UserRepository } from './user-repository'
+import { UserRepository } from '~/user/repository/user-repository'
 import { User } from '@packages/domain'
 import { UserData } from '~/data/entity'
 import { AppDataSource } from '~/data/data-source'

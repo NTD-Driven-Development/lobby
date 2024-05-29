@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Game, GameId, GameStatus } from '@packages/domain'
-import { GameRepository } from './game-repository'
+import { GameRepository } from '~/game/repository/game-repository'
 import { GameData } from '~/data/entity'
 import { injectable } from 'tsyringe'
 import { Repository } from 'typeorm'

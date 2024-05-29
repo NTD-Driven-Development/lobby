@@ -1,9 +1,7 @@
 import { UpdateGameInfoCommandSchema, UseCase } from '@packages/domain'
-import { GameRepository } from '../repository/game-repository'
-import { EventBus } from '~/eventbus/eventbus'
 import { autoInjectable, inject } from 'tsyringe'
-import { WebSocketEventBus } from '~/eventbus/websocket-eventbus'
-import { GameRepositoryImpl } from '../repository/game-repository-impl'
+import { EventBus, WebSocketEventBus } from '~/eventbus'
+import { GameRepository, GameRepositoryImpl } from '~/game/repository'
 
 export type UpdateGameInfoInput = UpdateGameInfoCommandSchema
 
