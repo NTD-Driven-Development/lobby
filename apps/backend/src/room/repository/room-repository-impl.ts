@@ -18,12 +18,25 @@ export class RoomRepositoryImpl implements RoomRepository {
         }
         return result.map(toDomain)
     }
+    /**
+     *
+     * @param roomId
+     * @returns
+     * @throws {EntityNotFoundError} if the room is not found
+     */
     public async findById(roomId: string): Promise<Room> {
         return toDomain(
-            await this.repo.findOneOrFail({
-                where: { id: roomId },
-            }),
-        ) as Room
+            await this.repo
+                .findOneOrFail({
+                    where: { id: roomId },
+                })
+                .catch((e) => {
+                    if (e.name === 'EntityNotFoundError') {
+                        throw new Error('Room not found')
+                    }
+                    throw e
+                }),
+        )
     }
     findByStatus(status: RoomStatus): Promise<Room[]> {
         throw new Error('Method not implemented.')
