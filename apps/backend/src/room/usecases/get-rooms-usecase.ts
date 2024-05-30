@@ -14,7 +14,12 @@ export class GetRoomsUseCase implements UseCase<GetRoomsInput, GetRoomsOutput> {
 
     async execute(input: GetRoomsInput): Promise<GetRoomsOutput> {
         const result = await this.roomRepository.findNotClosed()
-        const filteredResult = result.filter((room) => !input.status || room.status === input.status)
+        const filteredResult = result.filter(
+            (room) =>
+                (!input.status || room.status === input.status) &&
+                (!input.gameId || room.game.id === input.gameId) &&
+                (!input.search || room.name.includes(input.search)),
+        )
         return new GetRoomsResult(
             filteredResult.map((room) => ({
                 id: room.id,

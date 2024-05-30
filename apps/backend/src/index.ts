@@ -27,6 +27,7 @@ import { AppDataSource } from './data/data-source'
         app.register(socketIO, { cors: { origin: '*' } })
         app.ready(async (err) => {
             if (err) throw err
+            container.registerInstance(Socket, app.io)
 
             app.io.use(auth0Middleware() as any)
             app.io.on('connection', (socket: Server) => {
