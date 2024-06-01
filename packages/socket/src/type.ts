@@ -31,6 +31,8 @@ import {
     GetRoomsResultEventSchema,
     GetMyStatusEventSchema,
     GetMyStatusResultEventSchema,
+    PlayerKickedEventSchema,
+    KickPlayerEventSchema,
 } from '@packages/domain'
 import { Socket as BaseServer } from 'socket.io'
 import { Socket as BaseClient } from 'socket.io-client'
@@ -53,6 +55,7 @@ interface ServerToClientEvents {
     'user-info-updated': (event: UserInfoUpdatedEventSchema) => void
     'user-registered': (event: UserRegisteredEventSchema) => void
     'validation-error': (error: string) => void
+    'player-kicked': (event: PlayerKickedEventSchema) => void
 }
 
 interface ClientToServerEvents {
@@ -72,6 +75,7 @@ interface ClientToServerEvents {
     'start-game': (event: StartGameEventSchema) => void
     'update-user-info': (event: UpdateUserInfoEventSchema) => void
     'register-user': (event: RegisterUserEventSchema) => void
+    'kick-player': (event: KickPlayerEventSchema) => void
 }
 
 export type Server = BaseServer<ClientToServerEvents, ServerToClientEvents>

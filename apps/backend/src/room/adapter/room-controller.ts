@@ -5,6 +5,7 @@ import {
     GetRoomEventSchema,
     GetRoomsEventSchema,
     JoinRoomEventSchema,
+    KickPlayerEventSchema,
     LeaveRoomEventSchema,
 } from '@packages/domain'
 import { autoInjectable, inject } from 'tsyringe'
@@ -16,6 +17,7 @@ import {
     LeaveRoomUseCase,
     GetRoomUseCase,
     GetRoomsUseCase,
+    KickPlayerUseCase,
 } from '~/room/usecases'
 import { Server } from '@packages/socket'
 import { SocketThrow } from '~/decorators/socket-throw'
@@ -46,6 +48,8 @@ export class RoomController {
         private getRoomUseCase: GetRoomUseCase,
         @inject(GetRoomsUseCase)
         private getRoomsUseCase: GetRoomsUseCase,
+        @inject(KickPlayerUseCase)
+        private kickPlayerUseCase: KickPlayerUseCase,
     ) {}
 
     @SocketThrow
@@ -91,6 +95,14 @@ export class RoomController {
     public async getRooms(event: GetRoomsEventSchema, user: Readonly<Auth0User>) {
         return await this.getRoomsUseCase.execute({
             ...event.data,
+        })
+    }
+
+    @SocketThrow
+    public async kickPlayer(event: KickPlayerEventSchema, user: Readonly<Auth0User>) {
+        return await this.kickPlayerUseCase.execute({
+            ...event.data,
+            email: user.email,
         })
     }
 }

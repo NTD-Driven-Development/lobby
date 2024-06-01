@@ -9,6 +9,7 @@ import {
     RoomEndedGame,
     RoomStartedGame,
     RoomChangedHost,
+    PlayerKicked,
 } from '../events'
 import {
     JoinRoomCommandSchema,
@@ -18,6 +19,7 @@ import {
     CloseRoomCommandSchema,
     StartGameCommandSchema,
     CreateRoomCommandSchema,
+    KickPlayerCommandSchema,
 } from '../command'
 import { Game } from '../../game'
 
@@ -101,6 +103,9 @@ export class Room extends AggregateRoot<RoomId> {
                 this.addPlayer(event.data.player)
                 break
             case event instanceof PlayerLeftRoom:
+                this.removePlayer(event.data.playerId)
+                break
+            case event instanceof PlayerKicked:
                 this.removePlayer(event.data.playerId)
                 break
             case event instanceof PlayerReadinessChanged:
@@ -208,13 +213,13 @@ export class Room extends AggregateRoot<RoomId> {
         }
     }
 
-    public kickPlayer(hostId: PlayerId, playerId: PlayerId) {
-        this.validateHost(hostId)
-        const player = this.findPlayer(playerId)
+    public kickPlayer(payload: KickPlayerCommandSchema) {
+        this.validateHost(payload.hostId)
+        const player = this.findPlayer(payload.playerId)
         if (!player) {
             throw new Error('Player not found')
         }
-        this.apply(new PlayerLeftRoom({ roomId: this.id, playerId: playerId }))
+        this.apply(new PlayerKicked({ roomId: this.id, playerId: payload.playerId }))
     }
 
     public findPlayer(playerId: PlayerId) {

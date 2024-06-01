@@ -3,6 +3,7 @@ import {
     GameInfoUpdated,
     GameRegistered,
     PlayerJoinedRoom,
+    PlayerKicked,
     PlayerLeftRoom,
     PlayerReadinessChanged,
     RoomChangedHost,
@@ -82,6 +83,11 @@ export class WebSocketEventBus implements EventBus {
                 break
             case event instanceof UserInfoUpdated:
                 this.socket.emit('user-info-updated', event)
+                break
+            case event instanceof PlayerKicked:
+                this.socket.in(event.data.roomId).emit('player-kicked', event)
+                this.socket.emit('player-kicked', event)
+                this.socket.leave(event.data.roomId)
                 break
         }
     }
