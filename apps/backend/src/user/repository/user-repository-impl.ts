@@ -14,8 +14,8 @@ export class UserRepositoryImpl implements UserRepository {
     public async existsUserByEmail(email: string): Promise<boolean> {
         return (await this.repo.count({ where: { email } })) > 0
     }
-    findById(id: string): Promise<User> {
-        throw new Error('Method not implemented.')
+    public async findById(id: string): Promise<User> {
+        return toDomain(await this.repo.findOneOrFail({ where: { id } }))
     }
     findAll(ids: string[]): Promise<User[]> {
         throw new Error('Method not implemented.')

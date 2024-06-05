@@ -61,7 +61,7 @@ describe('socket on room-controller', () => {
         玩家 C 透過房間列表加入 B 的房間，
     `, (done) => {
         // given
-        const { clientA, clientB, clientC } = givenFourPlayersSocket()
+        const { clientA, clientB, clientC } = givenSixPlayersSocket()
         givenGame(clientA, '大老二').then((game) => {
             clientA.emit('create-room', givenCreateRoom(game.id, '123'))
             clientB.on('room-created', async (event) => {
@@ -102,17 +102,17 @@ describe('socket on room-controller', () => {
     })
 
     it(`
-        A, D 兩位玩家建立了大老二遊戲房間，
+        A, D 兩位玩家建立了十三支遊戲房間，
         D 加入 A 的房間，
         加入失敗，只能加入一個房間。
-        A 建立第二個大老二遊戲房間，
+        A 建立第二個十三支遊戲房間，
         建立失敗，只能建立一個房間。
     `, (done) => {
         // given
-        const { clientA, clientD } = givenFourPlayersSocket()
-        givenGame(clientA, '大老二').then((game) => {
+        const { clientA, clientD } = givenSixPlayersSocket()
+        givenGame(clientA, '十三支').then((game) => {
             clientA.emit('create-room', givenCreateRoom(game.id, null, 'A'))
-            assertCannotJoinSecondRoom(clientA, game, clientD).then(() => {
+            assertClientBCannotJoinSecondRoom(clientA, clientD, game).then(() => {
                 clientA.emit('create-room', givenCreateRoom(game.id, null, 'A2'))
                 clientA.on('validation-error', (error) => {
                     expect(error).toBe('Player has already joined a room')
@@ -121,10 +121,116 @@ describe('socket on room-controller', () => {
             })
         })
     })
+
+    it(`
+        玩家 test 查詢遊戲房間列表，
+        應包含大老二 2 間、十三支 2 間房間。
+        查詢大老二房間列表，
+        查詢結果 2 間。
+        查詢房間名稱包含 "A" 的列表，
+        查詢結果 1 間。
+    `, (done) => {
+        // given
+        client.emit('get-rooms', { type: 'get-rooms', data: {} })
+        client.on('get-rooms-result', (event) => {
+            client.off('get-rooms-result')
+            expect(event.data.filter((room) => room.game.name === '大老二').length).toBe(2)
+            expect(event.data.filter((room) => room.game.name === '十三支').length).toBe(2)
+            givenGame(client, '大老二').then((game) => {
+                client.emit('get-rooms', { type: 'get-rooms', data: { gameId: game.id } })
+                client.on('get-rooms-result', (event) => {
+                    client.off('get-rooms-result')
+                    expect(event.data.length).toBe(2)
+                    client.emit('get-rooms', { type: 'get-rooms', data: { search: 'A' } })
+                    client.on('get-rooms-result', (event) => {
+                        expect(event.data.length).toBe(1)
+                        done()
+                    })
+                })
+            })
+        })
+    })
+
+    it(`
+        A 已經在房間中，
+        A 退出房間，
+        A 創建了十三支遊戲房間，
+        B 加入了 A 的房間，
+        B 已加入房間，
+        A 將 B 踢出房間，
+        B 已離開房間。
+    `, (done) => {
+        // given
+        const { clientE, clientF } = givenSixPlayersSocket()
+
+        givenGame(clientE, '大老二').then((game) => {
+            // A create room
+            clientE.emit('create-room', givenCreateRoom(game.id, '123'))
+            // B join room
+            clientF.on('room-created', async (event) => {
+                clientF.off('room-created')
+                const roomId = event.data.roomId
+                // B join A's room
+                clientF.emit('join-room', givenJoinRoom(roomId, '123'))
+                clientF.on('player-joined-room', async () => {
+                    clientE.emit('get-room', { type: 'get-room', data: { roomId } })
+                    clientE.on('get-room-result', async (event) => {
+                        clientE.off('get-room-result')
+                        const players = event.data.players
+                        const kickUser = players.find((p) => p.name == 'F')
+                        clientE.emit('kick-player', { type: 'kick-player', data: { playerId: kickUser?.id as string, roomId } })
+                        clientF.on('player-kicked', () => {
+                            clientE.emit('get-room', { type: 'get-room', data: { roomId } })
+                            clientE.on('get-room-result', (event) => {
+                                expect(event.data).toEqual(
+                                    expect.objectContaining({
+                                        id: roomId,
+                                        name: '快來一起玩吧~',
+                                        game: expect.objectContaining({
+                                            id: game.id,
+                                            name: game.name,
+                                            description: game.description,
+                                            rule: game.rule,
+                                            minPlayers: game.minPlayers,
+                                            maxPlayers: game.maxPlayers,
+                                            imageUrl: game.imageUrl,
+                                        }),
+                                        host: expect.objectContaining({
+                                            id: expect.any(String),
+                                            name: 'E',
+                                            isReady: true,
+                                            status: 'CONNECTED',
+                                        }),
+                                        players: expect.arrayContaining([
+                                            expect.objectContaining({
+                                                id: expect.any(String),
+                                                name: 'E',
+                                                isReady: true,
+                                                status: 'CONNECTED',
+                                            }),
+                                        ]),
+                                        minPlayers: 4,
+                                        maxPlayers: 4,
+                                        isLocked: true,
+                                        createdAt: expect.any(String),
+                                        status: RoomStatus.WAITING,
+                                        isClosed: false,
+                                        gameUrl: null,
+                                    }),
+                                )
+                                done()
+                            })
+                        })
+                    })
+                })
+            })
+        })
+    })
 })
 
-async function assertCannotJoinSecondRoom(
+async function assertClientBCannotJoinSecondRoom(
     clientA: Client,
+    clientB: Client,
     game: {
         id: string
         name: string
@@ -137,19 +243,18 @@ async function assertCannotJoinSecondRoom(
         backendUrl: string
         status: GameStatus
     },
-    clientD: Client,
 ) {
     return Promise.all([
         new Promise((resolve) => {
             clientA.on('room-created', (event) => {
                 clientA.off('room-created')
                 const roomId = event.data.roomId
-                clientD.emit('create-room', givenCreateRoom(game.id, null, 'D'))
+                clientB.emit('create-room', givenCreateRoom(game.id, null, 'D'))
                 // D join A's room
-                clientD.on('room-created', () => {
-                    clientD.off('room-created')
-                    clientD.emit('join-room', givenJoinRoom(roomId))
-                    clientD.on('validation-error', (error) => {
+                clientB.on('room-created', () => {
+                    clientB.off('room-created')
+                    clientB.emit('join-room', givenJoinRoom(roomId))
+                    clientB.on('validation-error', (error) => {
                         expect(error).toBe('Player has already joined a room')
                         resolve(true)
                     })
@@ -298,7 +403,7 @@ function givenJoinRoom(roomId: string, password: string | null = null) {
     }
 }
 
-function givenFourPlayersSocket() {
+function givenSixPlayersSocket() {
     const clientA: Client = io(globalThis.SOCKET_URL, {
         reconnectionDelayMax: 0,
         reconnectionDelay: 0,
@@ -339,7 +444,27 @@ function givenFourPlayersSocket() {
             name: 'D',
         },
     })
-    return { clientA, clientB, clientC, clientD }
+    const clientE: Client = io(globalThis.SOCKET_URL, {
+        reconnectionDelayMax: 0,
+        reconnectionDelay: 0,
+        forceNew: true,
+        transports: ['websocket'],
+        auth: {
+            email: 'e@gmail.com',
+            name: 'E',
+        },
+    })
+    const clientF: Client = io(globalThis.SOCKET_URL, {
+        reconnectionDelayMax: 0,
+        reconnectionDelay: 0,
+        forceNew: true,
+        transports: ['websocket'],
+        auth: {
+            email: 'f@gmail.com',
+            name: 'F',
+        },
+    })
+    return { clientA, clientB, clientC, clientD, clientE, clientF }
 }
 
 async function givenGame(client: Client, name: string) {
@@ -376,7 +501,7 @@ function setUp(done: jest.DoneCallback) {
     })
 
     // Create two players
-    const { clientA, clientB, clientC, clientD } = givenFourPlayersSocket()
+    const { clientA, clientB, clientC, clientD, clientE, clientF } = givenSixPlayersSocket()
 
     Promise.all([
         new Promise((resolve) => {
@@ -389,6 +514,32 @@ function setUp(done: jest.DoneCallback) {
                 type: 'register-game',
                 data: {
                     name: '大老二',
+                    description: '待議',
+                    rule: '待議',
+                    minPlayers: 4,
+                    maxPlayers: 4,
+                    imageUrl: null,
+                    frontendUrl: 'http://localhost:3000',
+                    backendUrl: 'http://localhost:8000/api',
+                },
+            })
+            client.emit('register-game', {
+                type: 'register-game',
+                data: {
+                    name: '十三支',
+                    description: '待議',
+                    rule: '待議',
+                    minPlayers: 4,
+                    maxPlayers: 4,
+                    imageUrl: null,
+                    frontendUrl: 'http://localhost:3000',
+                    backendUrl: 'http://localhost:8000/api',
+                },
+            })
+            client.emit('register-game', {
+                type: 'register-game',
+                data: {
+                    name: '撿紅點',
                     description: '待議',
                     rule: '待議',
                     minPlayers: 4,
@@ -422,12 +573,24 @@ function setUp(done: jest.DoneCallback) {
                 resolve(true)
             })
         }),
+        new Promise((resolve) => {
+            clientE.on('connect', () => {
+                resolve(true)
+            })
+        }),
+        new Promise((resolve) => {
+            clientF.on('connect', () => {
+                resolve(true)
+            })
+        }),
     ]).then(() => {
         client.disconnect()
         clientA.disconnect()
         clientB.disconnect()
         clientC.disconnect()
         clientD.disconnect()
+        clientE.disconnect()
+        clientF.disconnect()
         done()
     })
 }

@@ -10,18 +10,33 @@ export class RoomRepositoryImpl implements RoomRepository {
     private repo: Repository<RoomData> = AppDataSource.getRepository(RoomData)
 
     public async findNotClosed(): Promise<Room[]> {
-        return (
-            await this.repo.find({
-                where: { isClosed: false },
-            })
-        ).map(toDomain) as Room[]
+        const result = await this.repo.find({
+            where: { isClosed: false },
+        })
+        if (result.length === 0) {
+            return []
+        }
+        return result.map(toDomain)
     }
+    /**
+     *
+     * @param roomId
+     * @returns
+     * @throws {EntityNotFoundError} if the room is not found
+     */
     public async findById(roomId: string): Promise<Room> {
         return toDomain(
-            await this.repo.findOneOrFail({
-                where: { id: roomId },
-            }),
-        ) as Room
+            await this.repo
+                .findOneOrFail({
+                    where: { id: roomId },
+                })
+                .catch((e) => {
+                    if (e.name === 'EntityNotFoundError') {
+                        throw new Error('Room not found')
+                    }
+                    throw e
+                }),
+        )
     }
     findByStatus(status: RoomStatus): Promise<Room[]> {
         throw new Error('Method not implemented.')
@@ -46,14 +61,14 @@ export class RoomRepositoryImpl implements RoomRepository {
         throw new Error('Method not implemented.')
     }
     public async findPlayerInNotClosedRoom(playerId: string): Promise<Room | null> {
-        return toDomain(
-            (
-                await this.repo.query(`
-                    SELECT * FROM room
-                    WHERE "players" @> '[{"id":"${playerId}"}]' and "isClosed" = false
-                `)
-            )[0],
-        )
+        const result = await this.repo.query(`
+            SELECT * FROM room
+            WHERE "players" @> '[{"id":"${playerId}"}]' and "isClosed" = false
+        `)
+        if (!result[0]) {
+            return null
+        }
+        return toDomain(result[0])
     }
 }
 
@@ -74,10 +89,7 @@ function toData(aggregate: Room) {
     return data
 }
 
-function toDomain(data: RoomData | null) {
-    if (!data) {
-        return null
-    }
+function toDomain(data: RoomData) {
     return new Room(
         data.id,
         data.name,
