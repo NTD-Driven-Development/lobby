@@ -10,6 +10,12 @@ describe('socket on room-controller', () => {
         await setUp()
     })
 
+    afterEach((done) => {
+        setTimeout(() => {
+            done()
+        }, 200)
+    })
+
     it(`
         玩家在 Lobby 中建立大老二遊戲房間
         房間名稱為「快來一起玩吧~」
@@ -102,24 +108,38 @@ describe('socket on room-controller', () => {
         查詢結果 2 間。
         查詢房間名稱包含 "A2" 的列表，
         查詢結果 1 間。
-    `, (done) => {
+    `, async () => {
         // given
         const client = createClient('test')
-        client.emit('get-rooms', { type: 'get-rooms', data: {} })
-        client.once('get-rooms-result', (event) => {
-            expect(event.data.filter((room) => room.game.name === '大老二').length).toBe(2)
-            expect(event.data.filter((room) => room.game.name === '十三支').length).toBe(2)
+        await new Promise((resolve) => {
+            client.on('connect', () => {
+                resolve(true)
+            })
+        })
+        await new Promise((resolve) => {
+            client.once('get-rooms-result', (event) => {
+                expect(event.data.filter((room) => room.game.name === '大老二').length).toBe(2)
+                expect(event.data.filter((room) => room.game.name === '十三支').length).toBe(2)
+                resolve(true)
+            })
+            client.emit('get-rooms', { type: 'get-rooms', data: {} })
+        })
+        await new Promise((resolve) => {
             givenGame(client, '大老二').then((game) => {
-                client.emit('get-rooms', { type: 'get-rooms', data: { gameId: game.id } })
                 client.once('get-rooms-result', (event) => {
                     expect(event.data.length).toBe(2)
-                    client.emit('get-rooms', { type: 'get-rooms', data: { search: 'A2' } })
-                    client.once('get-rooms-result', (event) => {
-                        expect(event.data.length).toBe(1)
-                        done()
-                    })
+                    resolve(true)
                 })
+                client.emit('get-rooms', { type: 'get-rooms', data: { gameId: game.id } })
             })
+        })
+
+        await new Promise((resolve) => {
+            client.once('get-rooms-result', (event) => {
+                expect(event.data.length).toBe(1)
+                resolve(true)
+            })
+            client.emit('get-rooms', { type: 'get-rooms', data: { search: 'A2' } })
         })
     })
 
