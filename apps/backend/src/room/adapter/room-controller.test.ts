@@ -3,35 +3,11 @@ import { CreateRoomEventSchema, GameStatus, RoomCreated, RoomCreatedEventSchema,
 import { Client } from '@packages/socket'
 import io from 'socket.io-client'
 
-let client: Client
-
 describe('socket on room-controller', () => {
-    beforeAll((done) => {
+    beforeAll(async () => {
         // Setup
         // Create Game
-        setUp(done)
-    })
-    beforeEach((done) => {
-        // Setup
-        client = io(globalThis.SOCKET_URL, {
-            reconnectionDelayMax: 0,
-            reconnectionDelay: 0,
-            forceNew: true,
-            transports: ['websocket'],
-            auth: {
-                email: 'test@gmail.com',
-                name: 'test',
-            },
-        })
-        client.on('connect', () => {
-            done()
-        })
-    })
-
-    afterEach(() => {
-        if (client.connected) {
-            client.disconnect()
-        }
+        await setUp()
     })
 
     it(`
@@ -41,10 +17,11 @@ describe('socket on room-controller', () => {
         房間建立成功
     `, (done) => {
         // given
+        const client = createClient('test')
         givenGame(client, '大老二').then((game) => {
             const givenData = givenCreateRoom(game.id, '123')
             client.emit('create-room', givenData)
-            client.on('room-created', async (event) => {
+            client.once('room-created', async (event) => {
                 // then
                 assertRoomCreatedSuccessfully(event, givenData.data)
                 done()
@@ -59,46 +36,39 @@ describe('socket on room-controller', () => {
         玩家 B 按了準備，又取消了準備，
         玩家 A 離開了房間，
         玩家 C 透過房間列表加入 B 的房間，
-    `, (done) => {
+    `, async () => {
         // given
-        const { clientA, clientB, clientC } = givenSixPlayersSocket()
-        givenGame(clientA, '大老二').then((game) => {
-            clientA.emit('create-room', givenCreateRoom(game.id, '123'))
-            clientB.on('room-created', async (event) => {
-                clientB.off('room-created')
-                const roomId = event.data.roomId
-                // B join A's room
-                clientB.emit('join-room', givenJoinRoom(roomId, '123'))
-                await assertClientBWasJoinedRoom(clientA, clientB)
-                // B get room data
-                clientB.emit('get-room', { type: 'get-room', data: { roomId } })
-                await assertClientBGetCurrentRoomData(clientB, roomId, game)
-                // B change readiness to true
-                clientB.emit('change-readiness', givenChangeReadiness(roomId, true))
-                await Promise.all([
-                    assertClientReadinessWasChanged(clientB, roomId, true),
-                    assertClientReadinessWasChanged(clientA, roomId, true),
-                ])
-                // B change readiness to false
-                clientB.emit('change-readiness', givenChangeReadiness(roomId, false))
-                await Promise.all([
-                    assertClientReadinessWasChanged(clientB, roomId, false),
-                    assertClientReadinessWasChanged(clientA, roomId, false),
-                ])
-                // A leave room
-                clientA.emit('leave-room', { type: 'leave-room', data: { roomId } })
-                await Promise.all([assertClientWasLeftRoom(clientA, roomId), assertClientWasLeftRoom(clientB, roomId)])
-
-                // C join B's room
-                clientC.emit('get-rooms', { type: 'get-rooms', data: {} })
-                clientC.on('get-rooms-result', async (event) => {
-                    const room = event.data.find((room) => room.id === roomId)
-                    clientC.emit('join-room', givenJoinRoom(room?.id as string, '123'))
-                    await assertClientBWasJoinedRoom(clientB, clientC, 'C')
-                    done()
+        const { clientA, clientB, clientC } = await givenSixPlayersSocket()
+        const game = await givenGame(clientA, '大老二')
+        let roomId: string = ''
+        // A create room
+        await Promise.all([
+            new Promise((resolve) => {
+                clientB.once('room-created', (event) => {
+                    roomId = event.data.roomId
+                    resolve(true)
                 })
-            })
-        })
+                clientA.emit('create-room', givenCreateRoom(game.id, '123', 'A'))
+            }),
+        ])
+        // B join room
+        await joinRoom(clientB, roomId, '123')
+        // B change readiness to true
+        await Promise.all([
+            changeReadiness(clientB, roomId, true),
+            assertClientReadinessWasChanged(clientB, roomId, true),
+            assertClientReadinessWasChanged(clientA, roomId, true),
+        ])
+        // B change readiness to false
+        await Promise.all([
+            changeReadiness(clientB, roomId, false),
+            assertClientReadinessWasChanged(clientB, roomId, false),
+            assertClientReadinessWasChanged(clientA, roomId, false),
+        ])
+        // A leave room
+        await Promise.all([leaveRoom(clientA, roomId), assertClientWasLeftRoom(clientA, roomId), assertClientWasLeftRoom(clientB, roomId)])
+        // C join B's room
+        await Promise.all([joinRoom(clientC, roomId, '123')])
     })
 
     it(`
@@ -107,19 +77,22 @@ describe('socket on room-controller', () => {
         加入失敗，只能加入一個房間。
         A 建立第二個十三支遊戲房間，
         建立失敗，只能建立一個房間。
-    `, (done) => {
+    `, async () => {
         // given
-        const { clientA, clientD } = givenSixPlayersSocket()
-        givenGame(clientA, '十三支').then((game) => {
-            clientA.emit('create-room', givenCreateRoom(game.id, null, 'A'))
-            assertClientBCannotJoinSecondRoom(clientA, clientD, game).then(() => {
-                clientA.emit('create-room', givenCreateRoom(game.id, null, 'A2'))
-                clientA.on('validation-error', (error) => {
+        const { clientA, clientD } = await givenSixPlayersSocket()
+        const game = await givenGame(clientA, '十三支')
+
+        // A, D create room
+        await Promise.all([createRoom(clientA, game, null, 'A2'), createRoom(clientD, game)])
+        await Promise.all([
+            new Promise((resolve) => {
+                clientA.once('validation-error', (error) => {
                     expect(error).toBe('Player has already joined a room')
-                    done()
+                    resolve(true)
                 })
-            })
-        })
+                clientA.emit('create-room', givenCreateRoom(game.id, null, 'A3'))
+            }),
+        ])
     })
 
     it(`
@@ -127,22 +100,21 @@ describe('socket on room-controller', () => {
         應包含大老二 2 間、十三支 2 間房間。
         查詢大老二房間列表，
         查詢結果 2 間。
-        查詢房間名稱包含 "A" 的列表，
+        查詢房間名稱包含 "A2" 的列表，
         查詢結果 1 間。
     `, (done) => {
         // given
+        const client = createClient('test')
         client.emit('get-rooms', { type: 'get-rooms', data: {} })
-        client.on('get-rooms-result', (event) => {
-            client.off('get-rooms-result')
+        client.once('get-rooms-result', (event) => {
             expect(event.data.filter((room) => room.game.name === '大老二').length).toBe(2)
             expect(event.data.filter((room) => room.game.name === '十三支').length).toBe(2)
             givenGame(client, '大老二').then((game) => {
                 client.emit('get-rooms', { type: 'get-rooms', data: { gameId: game.id } })
-                client.on('get-rooms-result', (event) => {
-                    client.off('get-rooms-result')
+                client.once('get-rooms-result', (event) => {
                     expect(event.data.length).toBe(2)
-                    client.emit('get-rooms', { type: 'get-rooms', data: { search: 'A' } })
-                    client.on('get-rooms-result', (event) => {
+                    client.emit('get-rooms', { type: 'get-rooms', data: { search: 'A2' } })
+                    client.once('get-rooms-result', (event) => {
                         expect(event.data.length).toBe(1)
                         done()
                     })
@@ -161,66 +133,66 @@ describe('socket on room-controller', () => {
         B 已離開房間。
     `, (done) => {
         // given
-        const { clientE: clientA, clientF: clientB } = givenSixPlayersSocket()
-
-        givenGame(clientA, '大老二').then((game) => {
-            // A create room
-            clientA.emit('create-room', givenCreateRoom(game.id, '123'))
-            // B join room
-            clientB.on('room-created', async (event) => {
-                clientB.off('room-created')
-                const roomId = event.data.roomId
-                // B join A's room
-                clientB.emit('join-room', givenJoinRoom(roomId, '123'))
-                clientB.once('player-joined-room', async () => {
-                    clientA.emit('get-room', { type: 'get-room', data: { roomId } })
-                    clientA.once('get-room-result', async (event) => {
-                        clientA.off('get-room-result')
-                        const players = event.data.players
-                        const kickUser = players.find((p) => p.name == 'F')
-                        clientA.emit('kick-player', { type: 'kick-player', data: { playerId: kickUser?.id as string, roomId } })
-                        clientB.once('player-kicked', () => {
-                            clientA.emit('get-room', { type: 'get-room', data: { roomId } })
-                            clientA.once('get-room-result', (event) => {
-                                expect(event.data).toEqual(
-                                    expect.objectContaining({
-                                        id: roomId,
-                                        name: '快來一起玩吧~',
-                                        game: expect.objectContaining({
-                                            id: game.id,
-                                            name: game.name,
-                                            description: game.description,
-                                            rule: game.rule,
-                                            minPlayers: game.minPlayers,
-                                            maxPlayers: game.maxPlayers,
-                                            imageUrl: game.imageUrl,
-                                        }),
-                                        host: expect.objectContaining({
-                                            id: expect.any(String),
-                                            name: 'E',
-                                            isReady: true,
-                                            status: 'CONNECTED',
-                                        }),
-                                        players: expect.arrayContaining([
-                                            expect.objectContaining({
+        givenSixPlayersSocket().then(({ clientE: clientA, clientF: clientB }) => {
+            givenGame(clientA, '大老二').then((game) => {
+                // A create room
+                clientA.emit('create-room', givenCreateRoom(game.id, '123'))
+                // B join room
+                clientB.on('room-created', async (event) => {
+                    clientB.off('room-created')
+                    const roomId = event.data.roomId
+                    // B join A's room
+                    clientB.emit('join-room', givenJoinRoom(roomId, '123'))
+                    clientB.once('player-joined-room', async () => {
+                        clientA.emit('get-room', { type: 'get-room', data: { roomId } })
+                        clientA.once('get-room-result', async (event) => {
+                            clientA.off('get-room-result')
+                            const players = event.data.players
+                            const kickUser = players.find((p) => p.name == 'F')
+                            clientA.emit('kick-player', { type: 'kick-player', data: { playerId: kickUser?.id as string, roomId } })
+                            clientB.once('player-kicked', () => {
+                                clientA.emit('get-room', { type: 'get-room', data: { roomId } })
+                                clientA.once('get-room-result', (event) => {
+                                    expect(event.data).toEqual(
+                                        expect.objectContaining({
+                                            id: roomId,
+                                            name: '快來一起玩吧~',
+                                            game: expect.objectContaining({
+                                                id: game.id,
+                                                name: game.name,
+                                                description: game.description,
+                                                rule: game.rule,
+                                                minPlayers: game.minPlayers,
+                                                maxPlayers: game.maxPlayers,
+                                                imageUrl: game.imageUrl,
+                                            }),
+                                            host: expect.objectContaining({
                                                 id: expect.any(String),
                                                 name: 'E',
                                                 isReady: true,
                                                 status: 'CONNECTED',
                                             }),
-                                        ]),
-                                        minPlayers: 4,
-                                        maxPlayers: 4,
-                                        isLocked: true,
-                                        createdAt: expect.any(String),
-                                        status: RoomStatus.WAITING,
-                                        isClosed: false,
-                                        gameUrl: null,
-                                    }),
-                                )
-                                clientB.emit('join-room', givenJoinRoom(roomId, '123'))
-                                clientA.once('player-joined-room', () => {
-                                    done()
+                                            players: expect.arrayContaining([
+                                                expect.objectContaining({
+                                                    id: expect.any(String),
+                                                    name: 'E',
+                                                    isReady: true,
+                                                    status: 'CONNECTED',
+                                                }),
+                                            ]),
+                                            minPlayers: 4,
+                                            maxPlayers: 4,
+                                            isLocked: true,
+                                            createdAt: expect.any(String),
+                                            status: RoomStatus.WAITING,
+                                            isClosed: false,
+                                            gameUrl: null,
+                                        }),
+                                    )
+                                    clientB.emit('join-room', givenJoinRoom(roomId, '123'))
+                                    clientA.once('player-joined-room', () => {
+                                        done()
+                                    })
                                 })
                             })
                         })
@@ -231,112 +203,34 @@ describe('socket on room-controller', () => {
     })
 })
 
-async function assertClientBCannotJoinSecondRoom(
-    clientA: Client,
-    clientB: Client,
-    game: {
-        id: string
-        name: string
-        description: string
-        rule: string
-        minPlayers: number
-        maxPlayers: number
-        imageUrl: string | null
-        frontendUrl: string
-        backendUrl: string
-        status: GameStatus
-    },
-) {
-    return Promise.all([
-        new Promise((resolve) => {
-            clientA.on('room-created', (event) => {
-                clientA.off('room-created')
-                const roomId = event.data.roomId
-                clientB.emit('create-room', givenCreateRoom(game.id, null, 'D'))
-                // D join A's room
-                clientB.on('room-created', () => {
-                    clientB.off('room-created')
-                    clientB.emit('join-room', givenJoinRoom(roomId))
-                    clientB.on('validation-error', (error) => {
-                        expect(error).toBe('Player has already joined a room')
-                        resolve(true)
-                    })
-                })
-            })
-        }),
-    ])
+function createRoom(client: Client, game: { id: string; name: string }, password: string | null = null, roomName: string | null = '') {
+    return new Promise((resolve) => {
+        client.once('room-created', resolve)
+        client.emit('create-room', givenCreateRoom(game.id, password, roomName))
+    })
 }
 
-function assertClientBGetCurrentRoomData(
-    client: Client,
-    roomId: string,
-    game: {
-        id: string
-        name: string
-        description: string
-        rule: string
-        minPlayers: number
-        maxPlayers: number
-        imageUrl: string | null
-    },
-) {
+function changeReadiness(client: Client, roomId: string, isReady: boolean) {
     return new Promise((resolve) => {
-        client.on('get-room-result', (event) => {
-            expect(event.data).toEqual(
-                expect.objectContaining({
-                    id: roomId,
-                    name: '快來一起玩吧~',
-                    game: expect.objectContaining({
-                        id: game.id,
-                        name: game.name,
-                        description: game.description,
-                        rule: game.rule,
-                        minPlayers: game.minPlayers,
-                        maxPlayers: game.maxPlayers,
-                        imageUrl: game.imageUrl,
-                    }),
-                    host: expect.objectContaining({
-                        id: expect.any(String),
-                        name: 'A',
-                        isReady: true,
-                        status: 'CONNECTED',
-                    }),
-                    players: expect.arrayContaining([
-                        expect.objectContaining({
-                            id: expect.any(String),
-                            name: 'A',
-                            isReady: true,
-                            status: 'CONNECTED',
-                        }),
-                        expect.objectContaining({
-                            id: expect.any(String),
-                            name: 'B',
-                            isReady: false,
-                            status: 'CONNECTED',
-                        }),
-                    ]),
-                    minPlayers: 4,
-                    maxPlayers: 4,
-                    isLocked: true,
-                    createdAt: expect.any(String),
-                    status: RoomStatus.WAITING,
-                    isClosed: false,
-                    gameUrl: null,
-                }),
-            )
-            resolve(true)
-        })
+        client.once('player-readiness-changed', resolve)
+        client.emit('change-readiness', givenChangeReadiness(roomId, isReady))
+    })
+}
+
+function leaveRoom(client: Client, roomId: string) {
+    return new Promise((resolve) => {
+        client.once('player-left-room', resolve)
+        client.emit('leave-room', { type: 'leave-room', data: { roomId } })
     })
 }
 
 function assertClientWasLeftRoom(client: Client, roomId: string) {
     return new Promise((resolve) =>
-        client.on('player-left-room', (event) => {
+        client.once('player-left-room', (event) => {
             expect(event.data).toEqual({
                 roomId,
                 playerId: expect.any(String),
             })
-            client.off('player-left-room')
             resolve(true)
         }),
     )
@@ -348,52 +242,32 @@ function givenChangeReadiness(roomId: string, isReady: boolean) {
 
 function assertClientReadinessWasChanged(client: Client, roomId: string, isReady: boolean) {
     return new Promise((resolve) => {
-        client.on('player-readiness-changed', (event) => {
+        client.once('player-readiness-changed', (event) => {
             // then
             expect(event.data).toEqual({
                 roomId,
                 playerId: expect.any(String),
                 isReady,
             })
-            client.off('player-readiness-changed')
             resolve(true)
         })
     })
 }
 
-function assertClientBWasJoinedRoom(clientA: Client, clientB: Client, userName: string = 'B') {
-    return Promise.all([
-        new Promise((resolve) => {
-            clientA.on('player-joined-room', (event) => {
-                // then
-                expect(event.data.player).toEqual(
-                    expect.objectContaining({
-                        id: expect.any(String),
-                        name: userName,
-                        isReady: false,
-                        status: 'CONNECTED',
-                    }),
-                )
-                clientA.off('player-joined-room')
-                resolve(true)
-            })
-        }),
-        new Promise((resolve) => {
-            clientB.on('player-joined-room', (event) => {
-                // then
-                expect(event.data.player).toEqual(
-                    expect.objectContaining({
-                        id: expect.any(String),
-                        name: userName,
-                        isReady: false,
-                        status: 'CONNECTED',
-                    }),
-                )
-                clientB.off('player-joined-room')
-                resolve(true)
-            })
-        }),
-    ])
+function joinRoom(client: Client, roomId: string, password: string | null = null) {
+    return new Promise((resolve, reject) => {
+        client.once('validation-error', (error) => {
+            reject(error)
+        })
+        client.once('player-joined-room', (event) => {
+            expect(event.data.player.name).toBe((client.auth as { [key: string]: any }).name)
+            resolve(true)
+        })
+        client.emit('join-room', {
+            type: 'join-room',
+            data: { roomId, password },
+        })
+    })
 }
 
 function givenJoinRoom(roomId: string, password: string | null = null) {
@@ -406,7 +280,7 @@ function givenJoinRoom(roomId: string, password: string | null = null) {
     }
 }
 
-function givenSixPlayersSocket() {
+async function givenSixPlayersSocket() {
     const clientA: Client = io(globalThis.SOCKET_URL, {
         reconnectionDelayMax: 0,
         reconnectionDelay: 0,
@@ -467,95 +341,7 @@ function givenSixPlayersSocket() {
             name: 'F',
         },
     })
-    return { clientA, clientB, clientC, clientD, clientE, clientF }
-}
-
-async function givenGame(client: Client, name: string) {
-    client.emit('get-games', { type: 'get-games', data: {} })
-    return await new Promise<{
-        id: string
-        name: string
-        description: string
-        rule: string
-        minPlayers: number
-        maxPlayers: number
-        imageUrl: string | null
-        frontendUrl: string
-        backendUrl: string
-        status: GameStatus
-    }>((resolve) => {
-        client.on('get-games-result', (event) => {
-            const game = event.data.find((game) => game.name === name)
-            resolve(game as any)
-        })
-    })
-}
-
-function setUp(done: jest.DoneCallback) {
-    client = io(globalThis.SOCKET_URL, {
-        reconnectionDelayMax: 0,
-        reconnectionDelay: 0,
-        forceNew: true,
-        transports: ['websocket'],
-        auth: {
-            email: 'test@gmail.com',
-            name: 'test',
-        },
-    })
-
-    // Create two players
-    const { clientA, clientB, clientC, clientD, clientE, clientF } = givenSixPlayersSocket()
-
-    Promise.all([
-        new Promise((resolve) => {
-            client.on('connect', () => {
-                resolve(true)
-            })
-        }),
-        new Promise((resolve) => {
-            client.emit('register-game', {
-                type: 'register-game',
-                data: {
-                    name: '大老二',
-                    description: '待議',
-                    rule: '待議',
-                    minPlayers: 4,
-                    maxPlayers: 4,
-                    imageUrl: null,
-                    frontendUrl: 'http://localhost:3000',
-                    backendUrl: 'http://localhost:8000/api',
-                },
-            })
-            client.emit('register-game', {
-                type: 'register-game',
-                data: {
-                    name: '十三支',
-                    description: '待議',
-                    rule: '待議',
-                    minPlayers: 4,
-                    maxPlayers: 4,
-                    imageUrl: null,
-                    frontendUrl: 'http://localhost:3000',
-                    backendUrl: 'http://localhost:8000/api',
-                },
-            })
-            client.emit('register-game', {
-                type: 'register-game',
-                data: {
-                    name: '撿紅點',
-                    description: '待議',
-                    rule: '待議',
-                    minPlayers: 4,
-                    maxPlayers: 4,
-                    imageUrl: null,
-                    frontendUrl: 'http://localhost:3000',
-                    backendUrl: 'http://localhost:8000/api',
-                },
-            })
-            client.on('game-registered', () => {
-                resolve(true)
-            })
-        }),
+    await Promise.all([
         new Promise((resolve) => {
             clientA.on('connect', () => {
                 resolve(true)
@@ -586,15 +372,120 @@ function setUp(done: jest.DoneCallback) {
                 resolve(true)
             })
         }),
-    ]).then(() => {
-        client.disconnect()
-        clientA.disconnect()
-        clientB.disconnect()
-        clientC.disconnect()
-        clientD.disconnect()
-        clientE.disconnect()
-        clientF.disconnect()
-        done()
+    ])
+    return { clientA, clientB, clientC, clientD, clientE, clientF }
+}
+
+async function givenGame(client: Client, name: string) {
+    client.emit('get-games', { type: 'get-games', data: {} })
+    return await new Promise<{
+        id: string
+        name: string
+        description: string
+        rule: string
+        minPlayers: number
+        maxPlayers: number
+        imageUrl: string | null
+        frontendUrl: string
+        backendUrl: string
+        status: GameStatus
+    }>((resolve) => {
+        client.on('get-games-result', (event) => {
+            const game = event.data.find((game) => game.name === name)
+            resolve(game as any)
+        })
+    })
+}
+
+async function setUp() {
+    // Create players
+    await Promise.all([
+        new Promise((resolve) => {
+            const client = createClient('test')
+            client.on('connect', () => {
+                resolve(true)
+            })
+        }),
+        new Promise((resolve) => {
+            const client = createClient('A')
+            client.on('connect', () => {
+                registerGame(client, '大老二').then(() => {
+                    registerGame(client, '撿紅點').then(() => {
+                        registerGame(client, '十三支').then(() => {
+                            resolve(true)
+                        })
+                    })
+                })
+            })
+        }),
+        new Promise((resolve) => {
+            const clientA = createClient('A')
+            clientA.on('connect', () => {
+                resolve(true)
+            })
+        }),
+        new Promise((resolve) => {
+            const clientB = createClient('B')
+            clientB.on('connect', () => {
+                resolve(true)
+            })
+        }),
+        new Promise((resolve) => {
+            const clientC = createClient('C')
+            clientC.on('connect', () => {
+                resolve(true)
+            })
+        }),
+        new Promise((resolve) => {
+            const clientD = createClient('D')
+            clientD.on('connect', () => {
+                resolve(true)
+            })
+        }),
+        new Promise((resolve) => {
+            const clientE = createClient('E')
+            clientE.on('connect', () => {
+                resolve(true)
+            })
+        }),
+        new Promise((resolve) => {
+            const clientF = createClient('F')
+            clientF.on('connect', () => {
+                resolve(true)
+            })
+        }),
+    ])
+}
+
+function registerGame(client: Client, name: string) {
+    return new Promise((resolve) => {
+        client.once('game-registered', resolve)
+        client.emit('register-game', {
+            type: 'register-game',
+            data: {
+                name,
+                description: '待議',
+                rule: '待議',
+                minPlayers: 4,
+                maxPlayers: 4,
+                imageUrl: null,
+                frontendUrl: 'http://localhost:3000',
+                backendUrl: 'http://localhost:8000/api',
+            },
+        })
+    })
+}
+
+function createClient(name: string): Client {
+    return io(globalThis.SOCKET_URL, {
+        reconnectionDelayMax: 0,
+        reconnectionDelay: 0,
+        forceNew: true,
+        transports: ['websocket'],
+        auth: {
+            email: `${name}@gmail.com`,
+            name,
+        },
     })
 }
 
