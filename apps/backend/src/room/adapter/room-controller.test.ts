@@ -161,27 +161,27 @@ describe('socket on room-controller', () => {
         B 已離開房間。
     `, (done) => {
         // given
-        const { clientE, clientF } = givenSixPlayersSocket()
+        const { clientE: clientA, clientF: clientB } = givenSixPlayersSocket()
 
-        givenGame(clientE, '大老二').then((game) => {
+        givenGame(clientA, '大老二').then((game) => {
             // A create room
-            clientE.emit('create-room', givenCreateRoom(game.id, '123'))
+            clientA.emit('create-room', givenCreateRoom(game.id, '123'))
             // B join room
-            clientF.on('room-created', async (event) => {
-                clientF.off('room-created')
+            clientB.on('room-created', async (event) => {
+                clientB.off('room-created')
                 const roomId = event.data.roomId
                 // B join A's room
-                clientF.emit('join-room', givenJoinRoom(roomId, '123'))
-                clientF.on('player-joined-room', async () => {
-                    clientE.emit('get-room', { type: 'get-room', data: { roomId } })
-                    clientE.on('get-room-result', async (event) => {
-                        clientE.off('get-room-result')
+                clientB.emit('join-room', givenJoinRoom(roomId, '123'))
+                clientB.once('player-joined-room', async () => {
+                    clientA.emit('get-room', { type: 'get-room', data: { roomId } })
+                    clientA.once('get-room-result', async (event) => {
+                        clientA.off('get-room-result')
                         const players = event.data.players
                         const kickUser = players.find((p) => p.name == 'F')
-                        clientE.emit('kick-player', { type: 'kick-player', data: { playerId: kickUser?.id as string, roomId } })
-                        clientF.on('player-kicked', () => {
-                            clientE.emit('get-room', { type: 'get-room', data: { roomId } })
-                            clientE.on('get-room-result', (event) => {
+                        clientA.emit('kick-player', { type: 'kick-player', data: { playerId: kickUser?.id as string, roomId } })
+                        clientB.once('player-kicked', () => {
+                            clientA.emit('get-room', { type: 'get-room', data: { roomId } })
+                            clientA.once('get-room-result', (event) => {
                                 expect(event.data).toEqual(
                                     expect.objectContaining({
                                         id: roomId,
@@ -218,7 +218,10 @@ describe('socket on room-controller', () => {
                                         gameUrl: null,
                                     }),
                                 )
-                                done()
+                                clientB.emit('join-room', givenJoinRoom(roomId, '123'))
+                                clientA.once('player-joined-room', () => {
+                                    done()
+                                })
                             })
                         })
                     })
