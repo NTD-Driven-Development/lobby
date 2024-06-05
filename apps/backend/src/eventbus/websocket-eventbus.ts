@@ -21,11 +21,10 @@ import { Socket } from 'socket.io'
 
 @autoInjectable()
 export class WebSocketEventBus implements EventBus {
-    private readonly socket: Server
-
-    public constructor(@inject(Socket) socket: Server) {
-        this.socket = socket
-    }
+    public constructor(
+        @inject(Socket) private readonly toClient: Server,
+        @inject('ServerSocket') private readonly server: Server,
+    ) {}
 
     public broadcast(events: DomainEvent[]) {
         events.forEach((event) => {
@@ -36,59 +35,48 @@ export class WebSocketEventBus implements EventBus {
     private handle(event: DomainEvent) {
         switch (true) {
             case event instanceof RoomCreated:
-                this.socket.broadcast.emit('room-created', event)
-                this.socket.emit('room-created', event)
-                this.socket.join(event.data.roomId)
+                this.server.emit('room-created', event)
+                this.toClient.join(event.data.roomId)
                 break
             case event instanceof RoomClosed:
-                this.socket.broadcast.emit('room-closed', event)
-                this.socket.emit('room-closed', event)
+                this.server.emit('room-closed', event)
                 break
             case event instanceof RoomChangedHost:
-                this.socket.in(event.data.roomId).emit('room-changed-host', event)
-                this.socket.emit('room-changed-host', event)
+                this.server.in(event.data.roomId).emit('room-changed-host', event)
                 break
             case event instanceof RoomEndedGame:
-                this.socket.in(event.data.roomId).emit('room-ended-game', event)
-                this.socket.emit('room-ended-game', event)
+                this.server.in(event.data.roomId).emit('room-ended-game', event)
                 break
             case event instanceof RoomStartedGame:
-                this.socket.in(event.data.roomId).emit('room-started-game', event)
-                this.socket.emit('room-started-game', event)
+                this.server.in(event.data.roomId).emit('room-started-game', event)
                 break
             case event instanceof PlayerJoinedRoom:
-                this.socket.join(event.data.roomId)
-                this.socket.in(event.data.roomId).emit('player-joined-room', event)
-                this.socket.emit('player-joined-room', event)
+                this.toClient.join(event.data.roomId)
+                this.server.in(event.data.roomId).emit('player-joined-room', event)
                 break
             case event instanceof PlayerLeftRoom:
-                this.socket.in(event.data.roomId).emit('player-left-room', event)
-                this.socket.emit('player-left-room', event)
-                this.socket.leave(event.data.roomId)
+                this.server.in(event.data.roomId).emit('player-left-room', event)
+                this.toClient.leave(event.data.roomId)
                 break
             case event instanceof PlayerReadinessChanged:
-                this.socket.in(event.data.roomId).emit('player-readiness-changed', event)
-                this.socket.emit('player-readiness-changed', event)
+                this.server.in(event.data.roomId).emit('player-readiness-changed', event)
                 break
             case event instanceof GameInfoUpdated:
-                this.socket.broadcast.emit('game-info-updated', event)
-                this.socket.emit('game-info-updated', event)
+                this.server.emit('game-info-updated', event)
                 break
             case event instanceof GameRegistered:
-                this.socket.broadcast.emit('game-registered', event)
-                this.socket.emit('game-registered', event)
+                this.server.emit('game-registered', event)
                 break
             case event instanceof UserRegistered:
-                this.socket.emit('user-registered', event)
+                this.toClient.emit('user-registered', event)
                 break
             case event instanceof UserInfoUpdated:
-                this.socket.emit('user-info-updated', event)
+                this.toClient.emit('user-info-updated', event)
                 break
             case event instanceof PlayerKicked:
-                this.socket.in(event.data.roomId).emit('player-kicked', event)
-                this.socket.emit('player-kicked', event)
-                if (event.data.playerId === this.socket.auth.user.id) {
-                    this.socket.leave(event.data.roomId)
+                this.server.in(event.data.roomId).emit('player-kicked', event)
+                if (event.data.playerId === this.toClient.auth.user.id) {
+                    this.toClient.leave(event.data.roomId)
                 }
                 break
         }

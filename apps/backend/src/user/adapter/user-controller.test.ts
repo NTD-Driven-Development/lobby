@@ -9,7 +9,7 @@ describe('socket on user-controller', () => {
     beforeAll((done) => {
         setUp(done)
     })
-    beforeEach(() => {
+    beforeEach((done) => {
         // Setup
         client = io(globalThis.SOCKET_URL, {
             reconnectionDelayMax: 0,
@@ -21,7 +21,9 @@ describe('socket on user-controller', () => {
                 email: 'test@example.com',
             },
         })
-        client.on('connect', () => {})
+        client.once('connect', () => {
+            done()
+        })
     })
 
     afterEach(() => {
@@ -39,13 +41,13 @@ describe('socket on user-controller', () => {
     `, (done) => {
         //when
         //given
-        // client.emit('register-user', {
-        //     type: 'register-user',
-        //     data: null,
-        // })
+        client.emit('register-user', {
+            type: 'register-user',
+            data: null,
+        })
 
         // then
-        client.on('user-registered', (event) => {
+        client.once('user-registered', (event) => {
             expect(event.data).toEqual(
                 expect.objectContaining<UserRegisteredEventSchema['data']>({
                     id: expect.any(String),
@@ -69,15 +71,15 @@ describe('socket on user-controller', () => {
             },
         } as UpdateUserInfoEventSchema)
         // then
-        client.on('user-info-updated', (event) => {
+        client.once('user-info-updated', (event) => {
             expect(event.data).toEqual(
                 expect.objectContaining<UserInfoUpdatedEventSchema['data']>({
                     id: expect.any(String),
                     name: '小明',
                 }),
             )
+            done()
         })
-        done()
     })
 
     it(`
@@ -88,7 +90,7 @@ describe('socket on user-controller', () => {
         // Emit sth from Client do Server
         givenGame(client, '狼人殺').then((game) => {
             client.emit('create-room', givenCreateRoom(game.id))
-            client.on('room-created', (event) => {
+            client.once('room-created', (event) => {
                 const roomId = event.data.roomId
                 // when
                 client.emit('get-my-status', {
@@ -96,7 +98,7 @@ describe('socket on user-controller', () => {
                     data: null,
                 })
                 // then
-                client.on('get-my-status-result', (event) => {
+                client.once('get-my-status-result', (event) => {
                     expect(event.data).toEqual(
                         expect.objectContaining({
                             id: expect.any(String),
@@ -113,7 +115,7 @@ describe('socket on user-controller', () => {
 })
 
 function setUp(done: jest.DoneCallback) {
-    client = io(globalThis.SOCKET_URL, {
+    const client = io(globalThis.SOCKET_URL, {
         reconnectionDelayMax: 0,
         reconnectionDelay: 0,
         forceNew: true,
@@ -139,7 +141,7 @@ function setUp(done: jest.DoneCallback) {
                     backendUrl: 'http://localhost:2013/api',
                 },
             })
-            client.on('game-registered', () => {
+            client.once('game-registered', () => {
                 resolve(true)
             })
         }),
@@ -176,7 +178,7 @@ async function givenGame(client: Client, name: string) {
         backendUrl: string
         status: GameStatus
     }>((resolve) => {
-        client.on('get-games-result', (event) => {
+        client.once('get-games-result', (event) => {
             const game = event.data.find((game) => game.name === name)
             resolve(game as any)
         })
