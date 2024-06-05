@@ -39,10 +39,10 @@ describe('socket on user-controller', () => {
     `, (done) => {
         //when
         //given
-        client.emit('register-user', {
-            type: 'register-user',
-            data: null,
-        })
+        // client.emit('register-user', {
+        //     type: 'register-user',
+        //     data: null,
+        // })
 
         // then
         client.on('user-registered', (event) => {

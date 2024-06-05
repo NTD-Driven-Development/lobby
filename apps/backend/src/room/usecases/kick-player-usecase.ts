@@ -28,7 +28,6 @@ export class KickPlayerUseCase implements UseCase<KickPlayerInput, void> {
         })
         await this.roomRepository.save(room)
         const events = room.getDomainEvents()
-        console.error(events)
         this.eventBus.broadcast(events)
     }
 }
