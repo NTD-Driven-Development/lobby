@@ -87,7 +87,9 @@ export class WebSocketEventBus implements EventBus {
             case event instanceof PlayerKicked:
                 this.socket.in(event.data.roomId).emit('player-kicked', event)
                 this.socket.emit('player-kicked', event)
-                this.socket.leave(event.data.roomId)
+                if (event.data.playerId === this.socket.auth.user.id) {
+                    this.socket.leave(event.data.roomId)
+                }
                 break
         }
     }
