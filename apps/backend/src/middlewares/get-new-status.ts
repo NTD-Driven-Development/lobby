@@ -16,6 +16,7 @@ const GetNewStatusHandler = (socket: Server) => async (event: Event, next: (err?
         'room-changed-host',
         'room-closed',
         'room-started-game',
+        'validation-error',
     ]
     socket.emit('get-my-status-result', status)
     if (roomEvents.includes(event[0])) {
