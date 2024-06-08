@@ -2,19 +2,14 @@ import { number, object, string } from 'yup';
 
 export const useRegisterStore = defineStore('register', () => {
     const appStore = useAppStore();
-    const { lobbySocket } = storeToRefs(appStore);
-
-    const state = reactive<State>({
-        form: {
-        },
-    });
+    const { app } = appStore;
 
     const submit = async () => {
         try {
             const data = schema.validateSync(state.form);
             state.form = {};
 
-            lobbySocket.value?.emit('register-game', {
+            app.lobbySocket?.emit('register-game', {
                 type: 'register-game',
                 data: {
                     name: data.name,
@@ -29,12 +24,16 @@ export const useRegisterStore = defineStore('register', () => {
             });
         }
         catch (error) {
-            console.log(error);
+            console.log(error)
         }
     }
 
-    return { state, submit };
-});
+    const state = reactive<State>({
+        form: {},
+    });
+
+    return { state, submit }
+})
 
 const schema = object({
     name: string().required(),
