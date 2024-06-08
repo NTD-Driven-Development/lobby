@@ -120,6 +120,10 @@ export class Room extends AggregateRoot<RoomId> {
         }
     }
 
+    isStarted() {
+        return this.status === RoomStatus.PLAYING
+    }
+
     isFull() {
         return this.players.length >= this.maxPlayers
     }
@@ -247,7 +251,8 @@ export class Room extends AggregateRoot<RoomId> {
     }
 
     public startGame(payload: StartGameCommandSchema) {
-        if (this.status === RoomStatus.PLAYING) {
+        this.validateHost(payload.playerId)
+        if (this.isStarted()) {
             throw new Error('The game has already started')
         }
         this.apply(

@@ -1,6 +1,5 @@
 import { RoomId, RoomStatus } from '../entity'
 import { DomainEvent } from '../../../core/entity'
-import { StartGameCommandSchema } from '../command'
 import { RoomEvent } from './room-event'
 
 export type RoomStartedGameSchema = {
@@ -19,5 +18,5 @@ export type RoomStartedGameEventSchema = RoomStartedGame
 
 export type StartGameEventSchema = {
     type: 'start-game'
-    data: StartGameCommandSchema
+    data: { roomId: RoomId }
 }

@@ -1,6 +1,5 @@
 import { RoomId, RoomStatus } from '../entity'
 import { DomainEvent } from '../../../core/entity'
-import { EndGameCommandSchema } from '../command'
 import { RoomEvent } from './room-event'
 
 export type RoomEndedGameSchema = {
@@ -16,8 +15,3 @@ export class RoomEndedGame extends DomainEvent implements RoomEvent {
 }
 
 export type RoomEndedGameEventSchema = RoomEndedGame
-
-export type EndGameEventSchema = {
-    type: 'end-game'
-    data: EndGameCommandSchema
-}

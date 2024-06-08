@@ -4,7 +4,7 @@ dotenv.config({ path: `../.env.${process.env.NODE_ENV}` })
 import 'reflect-metadata'
 import fastify from 'fastify'
 import socketIO from 'fastify-socket.io'
-import { GameEventHandlers, RoomEventHandlers, UserEventHandlers } from '~/routes'
+import { GameEventHandlers, RoomEventHandlers, RoomRoutes, UserEventHandlers } from '~/routes'
 import { Server } from '@packages/socket'
 import { Socket } from 'socket.io'
 import { container } from 'tsyringe'
@@ -19,13 +19,12 @@ import { GetNewStatusHandler } from './middlewares/get-new-status'
         // health check
         app.get('/api/health', (_, res) => res.send('ok'))
 
-        // prefix api
-        // app.register(RoomRoutes, { prefix: '/api/rooms' })
-        // app.register(GameRoutes, { prefix: '/api/games' })
-        // app.register(UserRoutes, { prefix: '/api/users' })
-
         // socket.io
         app.register(socketIO, { cors: { origin: '*' } })
+        // prefix api
+        app.register(RoomRoutes, { prefix: '/api/rooms' })
+        // app.register(GameRoutes, { prefix: '/api/games' })
+        // app.register(UserRoutes, { prefix: '/api/users' })
         app.ready(async (err) => {
             if (err) throw err
             container.registerInstance('ServerSocket', app.io)

@@ -9,6 +9,13 @@ import { Room, RoomStatus, Game, Player } from '@packages/domain'
 export class RoomRepositoryImpl implements RoomRepository {
     private repo: Repository<RoomData> = AppDataSource.getRepository(RoomData)
 
+    public async findByGameUrl(gameUrl: string): Promise<Room> {
+        const result = await this.repo.findOneOrFail({
+            where: { gameUrl, isClosed: false },
+        })
+        return toDomain(result)
+    }
+
     public async findNotClosed(): Promise<Room[]> {
         const result = await this.repo.find({
             where: { isClosed: false },
