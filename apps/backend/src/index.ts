@@ -10,6 +10,7 @@ import { Socket } from 'socket.io'
 import { container } from 'tsyringe'
 import { auth0Middleware } from '~/middlewares'
 import { AppDataSource } from './data/data-source'
+import { GetNewStatusHandler } from './middlewares/get-new-status'
 ;(async () => {
     try {
         // import { UserRoutes, RoomRoutes, GameRoutes } from '~/routes'
@@ -27,19 +28,18 @@ import { AppDataSource } from './data/data-source'
         app.register(socketIO, { cors: { origin: '*' } })
         app.ready(async (err) => {
             if (err) throw err
-            container.registerInstance(Socket, app.io)
+            container.registerInstance('ServerSocket', app.io)
 
             app.io.use(auth0Middleware() as any)
             app.io.on('connection', (socket: Server) => {
+                socket.on('disconnect', () => console.info('Socket disconnected!', socket.id))
                 container.registerInstance(Socket, socket)
 
                 console.info('Socket connected!', socket.id)
-
-                UserEventHandlers(socket)
-                RoomEventHandlers(socket)
-                GameEventHandlers(socket)
-
-                socket.on('disconnect', () => console.info('Socket disconnected!', socket.id))
+                socket.use(UserEventHandlers(socket))
+                socket.use(RoomEventHandlers(socket))
+                socket.use(GameEventHandlers(socket))
+                socket.use(GetNewStatusHandler(socket))
             })
 
             app.io.on('error', (error) => console.error('Socket error:', error))
