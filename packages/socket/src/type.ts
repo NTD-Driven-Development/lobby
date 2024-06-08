@@ -7,7 +7,6 @@ import {
     ChangeHostEventSchema,
     CreateRoomEventSchema,
     CloseRoomEventSchema,
-    EndGameEventSchema,
     StartGameEventSchema,
     UpdateUserInfoEventSchema,
     RegisterUserEventSchema,
@@ -71,7 +70,6 @@ interface ClientToServerEvents {
     'change-host': (event: ChangeHostEventSchema) => void
     'close-room': (event: CloseRoomEventSchema) => void
     'create-room': (event: CreateRoomEventSchema) => void
-    'end-game': (event: EndGameEventSchema) => void
     'start-game': (event: StartGameEventSchema) => void
     'update-user-info': (event: UpdateUserInfoEventSchema) => void
     'register-user': (event: RegisterUserEventSchema) => void

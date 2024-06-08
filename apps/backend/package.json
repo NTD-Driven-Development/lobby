@@ -84,6 +84,7 @@
     "dependencies": {
         "@packages/domain": "file:../../packages/domain",
         "@packages/socket": "file:../../packages/socket",
+        "axios": "^1.7.2",
         "dotenv": "^16.4.5",
         "fastify": "^4.26.2",
         "fastify-socket.io": "^5.0.0",
