@@ -9,7 +9,7 @@ export const RoomRoutes = (fastify: FastifyInstance, opts: FastifyPluginOptions,
     container.registerInstance('ServerSocket', fastify.io)
     container.registerInstance(Socket, fastify.io)
     const roomController = container.resolve(RoomController)
-    fastify.post('/gameEnd', roomController.gameEnd)
+    fastify.post('/gameEnd', roomController.gameEnd.bind(roomController))
     done()
 }
 
