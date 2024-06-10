@@ -15,6 +15,10 @@ export class GameService {
 
     public async discoveryGameServices(): Promise<void> {
         const games = await this.gameRepository.findAll()
+        if (games.length === 0) {
+            console.log('No game found')
+            return
+        }
         for await (const game of games) {
             console.log(`Game: ${game.name} is ${game.status}`)
             axios
