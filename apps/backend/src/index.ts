@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import dotenv from 'dotenv'
-dotenv.config({ path: `../.env.${process.env.NODE_ENV}` })
+import { config } from 'dotenv'
+if (process.env.NODE_ENV === 'production') {
+    config({ path: `../.env.${process.env.NODE_ENV}` })
+} else {
+    config({ path: `.env.${process.env.NODE_ENV}` })
+}
 import 'reflect-metadata'
 import fastify from 'fastify'
 import socketIO from 'fastify-socket.io'

@@ -1,6 +1,6 @@
 import { injectable } from 'tsyringe'
 import { RoomRepository } from '~/room/repository/room-repository'
-import { Repository } from 'typeorm'
+import { Equal, Repository } from 'typeorm'
 import { RoomData } from '~/data/entity'
 import { AppDataSource } from '~/data/data-source'
 import { Room, RoomStatus, Game, Player } from '@packages/domain'
@@ -35,7 +35,9 @@ export class RoomRepositoryImpl implements RoomRepository {
         return toDomain(
             await this.repo
                 .findOneOrFail({
-                    where: { id: roomId },
+                    where: {
+                        id: Equal(roomId),
+                    },
                 })
                 .catch((e) => {
                     if (e.name === 'EntityNotFoundError') {

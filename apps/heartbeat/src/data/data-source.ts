@@ -5,8 +5,7 @@ if (process.env.NODE_ENV === 'production') {
     config({ path: `.env.${process.env.NODE_ENV}` })
 }
 import { DataSource } from 'typeorm'
-import { GameData, RoomData, UserData } from '~/data/entity'
-import { ClearDatabaseFeatureToggle } from '~/feature-toggle'
+import { GameData } from '~/data/entity'
 
 export const AppDataSource = new DataSource({
     type: process.env.DB_TYPE as 'mariadb' | 'mongodb' | 'mysql' | 'mssql' | 'postgres',
@@ -15,10 +14,10 @@ export const AppDataSource = new DataSource({
     username: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    synchronize: true,
-    dropSchema: ClearDatabaseFeatureToggle.isEnabled(),
+    synchronize: false,
+    dropSchema: false,
     logging: ['error'],
-    entities: [GameData, RoomData, UserData],
+    entities: [GameData],
     subscribers: [],
     migrations: [],
     extra: {

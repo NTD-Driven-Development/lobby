@@ -1,4 +1,4 @@
-import { UseCase } from '@packages/domain'
+import { GameStatus, UseCase } from '@packages/domain'
 import { EventBus, WebSocketEventBus } from '~/eventbus'
 import { autoInjectable, inject } from 'tsyringe'
 import { RoomRepository, RoomRepositoryImpl } from '~/room/repository'
@@ -24,9 +24,9 @@ export class StartGameUseCase implements UseCase<StartGameInput, void> {
     async execute(input: StartGameInput): Promise<void> {
         const room = await this.roomRepository.findById(input.roomId)
         if (room.isStarted()) throw new Error('Game already started')
-
         const player = await this.userRepository.findByEmail(input.email)
         const game = await this.gameRepository.findById(room.game.id)
+        if (game.status === GameStatus.OFFLINE) throw new Error('Game Server is offline')
         const gameResponse = await axios.post(`${game.backendUrl}/api/startGame`, { headers: { 'Content-Type': 'application/json' } })
         room.startGame({
             playerId: player.id,

@@ -1,11 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { Game, GameId, GameStatus } from '@packages/domain'
-import { GameRepository } from '~/game/repository/game-repository'
+import { Game, GameStatus } from '@packages/domain'
+import { GameRepository } from './game-repository'
+import { Repository } from 'typeorm'
 import { GameData } from '~/data/entity'
-import { injectable } from 'tsyringe'
-import { Equal, Repository } from 'typeorm'
 import { AppDataSource } from '~/data/data-source'
+import { injectable } from 'tsyringe'
 
 @injectable()
 export class GameRepositoryImpl implements GameRepository {
@@ -14,22 +12,10 @@ export class GameRepositoryImpl implements GameRepository {
         this.repo = AppDataSource.getRepository(GameData)
     }
 
-    public async existsByUniqueName(uniqueName: string): Promise<boolean> {
-        throw new Error('Method not implemented.')
-    }
-    public async findById(id: GameId): Promise<Game> {
-        return toDomain(
-            await this.repo.findOneOrFail({
-                where: { id: Equal(id) },
-            }),
-        )
-    }
-    public async findGameRegistrations(): Promise<Game[]> {
+    public async findAll(): Promise<Game[]> {
         return (await this.repo.find()).map(toDomain)
     }
-    public async getNumberOfTotalGameRegistrations(): Promise<number> {
-        throw new Error('Method not implemented.')
-    }
+
     public async save(aggregate: Game): Promise<void> {
         await this.repo.save(toData(aggregate)).catch((e) => {
             if (e.code === '23505') {
@@ -37,9 +23,6 @@ export class GameRepositoryImpl implements GameRepository {
                 return this.save(aggregate)
             }
         })
-    }
-    public async delete(aggregate: Game): Promise<void> {
-        throw new Error('Method not implemented.')
     }
 }
 

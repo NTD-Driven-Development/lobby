@@ -6,7 +6,7 @@
                 <span class="p-text-secondary block">遊戲名稱：{{ state.room?.game.name }}</span>
                 <span class="p-text-secondary block">當前人數：{{ state.room?.players?.length }}</span>
             </div>
-            <div class="grid flex-1 grid-cols-[repeat(auto-fill,_minmax(300px,_1fr))] auto-rows-min gap-2">
+            <div class="grid flex-1 grid-cols-[repeat(auto-fill,_minmax(300px,_1fr))] auto-rows-min gap-2" v-if="state.room?.players">
                 <div v-for="player in state.room?.players" class="flex flex-col border p-3 gap-3 rounded-lg">
                     <div class="flex flex-col gap-1">
                         <div class="flex items-center justify-between">
