@@ -2,7 +2,7 @@ import { UseCase, RegisterUserCommandSchema, User } from '@packages/domain'
 import { EventBus, WebSocketEventBus } from '~/eventbus'
 import { autoInjectable, inject } from 'tsyringe'
 import { UserRepository, UserRepositoryImpl } from '~/user/repository'
-import { v4 } from 'node-uuid'
+import { v4 } from 'uuid'
 
 export type RegisterUserInput = RegisterUserCommandSchema
 
