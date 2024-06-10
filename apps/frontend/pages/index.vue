@@ -37,7 +37,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </template>
             </div>
             <Dialog v-model:visible="state.createRoomDialog.show" modal header="建立房間" class="min-w-[300px]">
                 <template class="flex flex-col">
