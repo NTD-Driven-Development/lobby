@@ -3,7 +3,7 @@ import { UserRepository } from '~/user/repository/user-repository'
 import { User } from '@packages/domain'
 import { UserData } from '~/data/entity'
 import { AppDataSource } from '~/data/data-source'
-import { Repository } from 'typeorm'
+import { Equal, Repository } from 'typeorm'
 
 @injectable()
 export class UserRepositoryImpl implements UserRepository {
@@ -15,7 +15,7 @@ export class UserRepositoryImpl implements UserRepository {
         return (await this.repo.count({ where: { email } })) > 0
     }
     public async findById(id: string): Promise<User> {
-        return toDomain(await this.repo.findOneOrFail({ where: { id } }))
+        return toDomain(await this.repo.findOneOrFail({ where: { id: Equal(id) } }))
     }
     findAll(ids: string[]): Promise<User[]> {
         throw new Error('Method not implemented.')
