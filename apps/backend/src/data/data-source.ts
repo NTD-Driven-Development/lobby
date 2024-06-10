@@ -1,5 +1,9 @@
-import dotenv from 'dotenv'
-dotenv.config({ path: `.env.${process.env.NODE_ENV}` })
+import { config } from 'dotenv'
+if (process.env.NODE_ENV === 'production') {
+    config({ path: __dirname + `/../.env.${process.env.NODE_ENV}` })
+} else {
+    config({ path: `.env.${process.env.NODE_ENV}` })
+}
 import { DataSource } from 'typeorm'
 import { GameData, RoomData, UserData } from '~/data/entity'
 import { ClearDatabaseFeatureToggle } from '~/feature-toggle'
