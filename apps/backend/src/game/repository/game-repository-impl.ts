@@ -4,7 +4,7 @@ import { Game, GameId, GameStatus } from '@packages/domain'
 import { GameRepository } from '~/game/repository/game-repository'
 import { GameData } from '~/data/entity'
 import { injectable } from 'tsyringe'
-import { Repository } from 'typeorm'
+import { Equal, Repository } from 'typeorm'
 import { AppDataSource } from '~/data/data-source'
 
 @injectable()
@@ -20,7 +20,7 @@ export class GameRepositoryImpl implements GameRepository {
     public async findById(id: GameId): Promise<Game> {
         return toDomain(
             await this.repo.findOneOrFail({
-                where: { id: id },
+                where: { id: Equal(id) },
             }),
         )
     }
