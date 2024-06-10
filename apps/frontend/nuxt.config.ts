@@ -19,4 +19,9 @@ export default defineNuxtConfig({
         },
 		importPT: { from: '~/presets/' },
     },
+	runtimeConfig: {
+        public: {
+            'BACKEND_URL': process.env.NUXT_PUBLIC_BACKEND_URL,
+        }
+    },
 })
