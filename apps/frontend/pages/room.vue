@@ -7,7 +7,7 @@
                 <span class="p-text-secondary block">當前人數：{{ state.room?.players?.length }}</span>
             </div>
             <div class="grid flex-1 grid-cols-[repeat(auto-fill,_minmax(300px,_1fr))] auto-rows-min gap-2">
-                <template v-if="state.room?.players">
+                <div v-if="state.room?.players">
                     <div v-for="player in state.room?.players" class="flex flex-col border p-3 gap-3 rounded-lg">
                         <div class="flex flex-col gap-1">
                             <div class="flex items-center justify-between">
@@ -27,7 +27,7 @@
                             </div>
                         </div>
                     </div>
-                </template>
+                </div>
             </div>
             <div class="flex pt-4 md:pt-6 gap-2">
                 <Button label="退出房間" severity="danger" class="w-full text-sm md:text-base" @click="leave"/>
