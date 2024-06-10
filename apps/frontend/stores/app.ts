@@ -8,8 +8,6 @@ const AUTH0_CONFIG = {
     clientId: '2QurxAMuqttQELIUu3qrAGHmbRcRBehJ',
 }
 
-const SOCKET_HOST = 'localhost:3001';
-
 export const useAppStore = defineStore('app', () => {
 	const init = async () => {
         const router = useRouter();
@@ -38,7 +36,7 @@ export const useAppStore = defineStore('app', () => {
         try {
             await app.auth?.loginWithRedirect({
                 authorizationParams: {
-                    redirect_uri: 'http://localhost:3000',
+                    redirect_uri: window.origin,
                 }
             });
         }
@@ -86,8 +84,9 @@ export const useAppStore = defineStore('app', () => {
 		}
 
 		const token = await app.auth?.getIdTokenClaims();
+        const config = useRuntimeConfig();
 
-		const s: Client = io(SOCKET_HOST, {
+		const s: Client = io(config.public.BACKEND_URL, {
 			reconnectionDelayMax: 0,
 			reconnectionDelay: 0,
 			forceNew: true,
