@@ -27,7 +27,7 @@
                             </div>
                         </div>
                     </div>
-                </template>
+                </div>
             </div>
             <div class="flex pt-4 md:pt-6 gap-2">
                 <Button label="退出房間" severity="danger" class="w-full text-sm md:text-base" @click="leave"/>
