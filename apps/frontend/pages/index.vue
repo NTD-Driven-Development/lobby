@@ -1,7 +1,7 @@
 <template>
     <NuxtLayout name="dashboard">
         <div class="flex flex-col h-full gap-3 p-3 md:p-6">
-            <div class="flex shrink-0 gap-2 overflow-auto">
+            <div class="flex shrink-0 gap-2 overflow-auto" v-if="state.games">
                 <div v-for="game in state.games" class="relative flex items-center justify-center min-w-[120px] max-w-[120px] min-h-[48px] max-h-[48px] text-sm border rounded cursor-pointer whitespace-prewrap"
                 :class="{ ' bg-gray-50/30 border-gray-400': game.id == state.currentGame?.id, 'bg-white': game.id != state.currentGame?.id }"
                 @click="state.currentGame = game">
@@ -13,7 +13,7 @@
                 <InputText placeholder="搜尋房間" v-model="state.search" class="w-full text-sm"></InputText>
                 <Button label="建立房間" @click="state.createRoomDialog.show = true" class="shrink-0 text-sm"></Button>
             </div>
-            <div class="grid flex-1 grid-cols-[repeat(auto-fill,_minmax(300px,_1fr))] auto-rows-min gap-2">
+            <div class="grid flex-1 grid-cols-[repeat(auto-fill,_minmax(300px,_1fr))] auto-rows-min gap-2" v-if="state.rooms">
                 <div v-for="room in state.rooms" class="flex flex-col border p-3 gap-3 cursor-pointer rounded-lg text-sm"
                 @click="onRoomClick(room)">
                     <div class="flex flex-col gap-1.5">
