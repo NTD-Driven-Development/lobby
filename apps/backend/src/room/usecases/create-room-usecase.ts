@@ -1,5 +1,5 @@
 import { Room, CreateRoomCommandSchema, UseCase, PlayerStatus, Player } from '@packages/domain'
-import { v4 } from 'node-uuid'
+import { v4 } from 'uuid'
 import { EventBus, WebSocketEventBus } from '~/eventbus'
 import { autoInjectable, inject } from 'tsyringe'
 import { RoomRepository, RoomRepositoryImpl } from '~/room/repository'

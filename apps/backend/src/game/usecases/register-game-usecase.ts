@@ -2,7 +2,7 @@ import { Game, RegisterGameCommandSchema, UseCase } from '@packages/domain'
 import { autoInjectable, inject } from 'tsyringe'
 import { EventBus, WebSocketEventBus } from '~/eventbus'
 import { GameRepository, GameRepositoryImpl } from '~/game/repository'
-import { v4 } from 'node-uuid'
+import { v4 } from 'uuid'
 
 export type RegisterGameInput = RegisterGameCommandSchema
 
