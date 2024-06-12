@@ -80,6 +80,8 @@ export const useAppStore = defineStore('app', () => {
     watch(() => app.isAuthenticated, async (n) => {
 		if (!n) {
 			app.lobbySocket?.disconnect();
+            app.status = undefined;
+            app.lobbySocket = undefined;
 			return;
 		}
 
