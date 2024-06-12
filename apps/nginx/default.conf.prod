@@ -1,0 +1,53 @@
+server {
+    #if ( $host ~* .microservices.com$ ){
+    #    return 444; #CONNECTION CLOSED WITHOUT RESPONSE
+    #}
+    listen 80;
+    listen [::]:80;
+    server_name lobbylobby.us-east-1.elasticbeanstalk.com;
+
+    # 憑證挑戰 ZeroSSL
+    # location ^~ /.well-known/pki-validation/ {
+    #     default_type "text/plain";
+    #     rewrite /.well-known/pki-validation/(.*) /$1 break;
+    #     root /var/www/;
+    # }
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    # enable server push
+    http2_push_preload off;
+    server_name lobbylobby.us-east-1.elasticbeanstalk.com;
+
+    ssl_certificate /var/www/certificate.crt;
+    ssl_certificate_key /var/www/private.key;
+
+    # reverse proxy with backend socket.io
+    location /socket.io {
+        proxy_pass http://backend:3001;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_connect_timeout 86400;
+        proxy_ignore_client_abort on;
+    }
+
+    # reverse proxy with backend api
+    location /api {
+        proxy_pass http://backend:3001;
+        proxy_set_header Host $host;
+    }
+
+    # reverse proxy with frontend
+    location / {
+        proxy_set_header Host $host;
+        proxy_pass http://frontend:3000;
+    }
+
+
+}

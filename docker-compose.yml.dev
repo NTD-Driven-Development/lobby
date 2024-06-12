@@ -1,6 +1,16 @@
 # version: '3'
 name: lobby
 services:
+  web_server:
+    image: nginx:1.21.4-alpine
+    volumes:
+      - ./apps/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./apps/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./apps/nginx:/var/www/
+    ports:
+      - "80:80"
+    networks:
+      - docker
   db:
     image: postgres:16-alpine3.19
     restart: unless-stopped
@@ -31,11 +41,9 @@ services:
     restart: unless-stopped
     working_dir: /apps/backend
     volumes:
-      - ./backend:/apps/backend
-      - ../packages/domain:/packages/domain
-      - ../packages/socket:/packages/socket
-    ports:
-      - "3001:3001"
+      - ./apps/backend:/apps/backend
+      - ./packages/domain:/packages/domain
+      - ./packages/socket:/packages/socket
     entrypoint: /bin/sh -c "sh entrypoint.sh; sleep infinity"
     depends_on:
       - db
@@ -46,10 +54,8 @@ services:
     restart: unless-stopped
     working_dir: /apps/heartbeat
     volumes:
-      - ./heartbeat:/apps/heartbeat
-      - ../packages/domain:/packages/domain
-    ports:
-      - "2999:2999"
+      - ./apps/heartbeat:/apps/heartbeat
+      - ./packages/domain:/packages/domain
     entrypoint: /bin/sh -c "sh entrypoint.sh; sleep infinity"
     depends_on:
       - db
@@ -61,13 +67,11 @@ services:
     restart: unless-stopped
     working_dir: /apps/frontend
     environment:
-      - NUXT_PUBLIC_BACKEND_URL=http://127.0.0.1:3001
+      - NUXT_PUBLIC_BACKEND_URL=http://127.0.0.1
     volumes:
-      - ./frontend:/apps/frontend
-      - ../packages/domain:/packages/domain
-      - ../packages/socket:/packages/socket
-    ports:
-      - "3000:3000"
+      - ./apps/frontend:/apps/frontend
+      - ./packages/domain:/packages/domain
+      - ./packages/socket:/packages/socket
     entrypoint: /bin/sh -c "sh entrypoint.sh; sleep infinity"
     depends_on:
       - db
