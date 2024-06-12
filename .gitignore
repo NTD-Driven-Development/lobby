@@ -43,3 +43,9 @@ yarn-error.log*
 **/build
 **/docs
 **/.output
+
+# ssl
+*.crt
+*.key
+
+default.conf
