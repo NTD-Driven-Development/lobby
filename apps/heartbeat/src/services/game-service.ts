@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import http from 'http'
 import { GameStatus } from '@packages/domain'
 import axios from 'axios'
 import { autoInjectable, inject } from 'tsyringe'
@@ -21,19 +23,23 @@ export class GameService {
         }
         for await (const game of games) {
             console.log(`Game: ${game.name} is ${game.status}`)
-            axios
+            const agent = axios.create({
+                httpAgent: new http.Agent({ keepAlive: false }),
+            })
+            agent
                 .get(`${game.backendUrl}/api/health`)
-                .then(async () => {
+                .then(() => {
                     if (game.status === GameStatus.ONLINE) return
                     console.log(`Game: ${game.name} server is healthy`)
                     game.changeStatus(GameStatus.ONLINE)
-                    await this.gameRepository.save(game)
+                    this.gameRepository.save(game)
                 })
-                .catch(async () => {
+                .catch((error: any) => {
                     if (game.status === GameStatus.OFFLINE) return
                     console.error(`Game: ${game.name} server is unhealthy`)
+                    console.log(error?.message)
                     game.changeStatus(GameStatus.OFFLINE)
-                    await this.gameRepository.save(game)
+                    this.gameRepository.save(game)
                 })
         }
     }
