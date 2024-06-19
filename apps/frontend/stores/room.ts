@@ -123,6 +123,10 @@ export const useRoomStore = defineStore('room', () => {
 
     const leave = async () => {
         await waitSocketConnected();
+        
+
+        if (!app.status?.roomId)
+            return;
 
         app.lobbySocket?.emit('leave-room', {
             type: 'leave-room',
