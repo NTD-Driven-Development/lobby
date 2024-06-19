@@ -1,5 +1,5 @@
 import { number, object, string } from 'yup';
-import type { GamesResultSchema, GetRoomsResultSchema, JoinRoomEventSchema, PlayerLeftRoom } from '@packages/domain';
+import { GameStatus, type GamesResultSchema, type GetRoomsResultSchema, type JoinRoomEventSchema, type PlayerLeftRoom } from '@packages/domain';
 
 export const useIndexStore = defineStore('index', () => {
     const appStore = useAppStore();
@@ -10,7 +10,9 @@ export const useIndexStore = defineStore('index', () => {
 
         app.lobbySocket?.emit('get-games', {
             type: 'get-games',
-            data: {},
+            data: {
+                status: GameStatus.ONLINE,
+            },
         });
 
         app.lobbySocket?.once('get-games-result', (event) => {
@@ -22,21 +24,35 @@ export const useIndexStore = defineStore('index', () => {
     const join = async (data: JoinRoomEventSchema['data']) => {
         await waitSocketConnected();
 
-        app.lobbySocket?.emit('leave-room', {
-            type: 'leave-room',
-            data: {
-                roomId: app.status?.roomId!,
-            },
-        });
+        if (app.status?.roomId) {
+            app.lobbySocket?.once('player-left-room', () => {
+                app.lobbySocket?.emit('join-room', {
+                    type: 'join-room',
+                    data: data
+                });
+        
+                app.lobbySocket?.on('player-joined-room', (event) => {
+                    navigateTo('/room');
+                });
+            });
 
-        app.lobbySocket?.emit('join-room', {
-            type: 'join-room',
-            data: data
-        });
-
-        app.lobbySocket?.on('player-joined-room', (event) => {
-            navigateTo('/room');
-        });
+            app.lobbySocket?.emit('leave-room', {
+                type: 'leave-room',
+                data: {
+                    roomId: app.status?.roomId!,
+                },
+            });
+        }
+        else {
+            app.lobbySocket?.emit('join-room', {
+                type: 'join-room',
+                data: data
+            });
+    
+            app.lobbySocket?.on('player-joined-room', (event) => {
+                navigateTo('/room');
+            });
+        }
     }
 
     const createRoomSubmit = () => {
@@ -46,27 +62,47 @@ export const useIndexStore = defineStore('index', () => {
             state.createRoomDialog.form = {};
             state.createRoomDialog.show = false;
 
-            app.lobbySocket?.emit('leave-room', {
-                type: 'leave-room',
-                data: {
-                    roomId: app.status?.roomId!,
-                },
-            });
+            if (app.status?.roomId) {
+                app.lobbySocket?.once('player-left-room', () => {
+                    app.lobbySocket?.emit('create-room', {
+                        type: 'create-room',
+                        data: {
+                            name: data.name,
+                            password: data.password ?? '',
+                            minPlayers: data.minPlayers,
+                            maxPlayers: data.maxPlayers,
+                            gameId: state.currentGame?.id!,
+                        },
+                    });
+        
+                    app.lobbySocket?.once('room-created', (event) => {
+                        navigateTo('/room');
+                    });
+                });
 
-            app.lobbySocket?.emit('create-room', {
-                type: 'create-room',
-                data: {
-                    name: data.name,
-                    password: data.password ?? '',
-                    minPlayers: data.minPlayers,
-                    maxPlayers: data.maxPlayers,
-                    gameId: state.currentGame?.id!,
-                },
-            });
-
-            app.lobbySocket?.once('room-created', (event) => {
-                navigateTo('/room');
-            });
+                app.lobbySocket?.emit('leave-room', {
+                    type: 'leave-room',
+                    data: {
+                        roomId: app.status?.roomId!,
+                    },
+                });
+            }
+            else {
+                app.lobbySocket?.emit('create-room', {
+                    type: 'create-room',
+                    data: {
+                        name: data.name,
+                        password: data.password ?? '',
+                        minPlayers: data.minPlayers,
+                        maxPlayers: data.maxPlayers,
+                        gameId: state.currentGame?.id!,
+                    },
+                });
+    
+                app.lobbySocket?.once('room-created', (event) => {
+                    navigateTo('/room');
+                });
+            }
         }
         catch (error) {
             console.log(error);

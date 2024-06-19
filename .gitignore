@@ -49,3 +49,4 @@ yarn-error.log*
 *.key
 
 default.conf
+docker-compose.yml
