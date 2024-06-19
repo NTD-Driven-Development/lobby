@@ -241,6 +241,9 @@ export class Room extends AggregateRoot<RoomId> {
         if (!player) {
             throw new Error('Player not found')
         }
+        if (this.isStarted()) {
+            throw new Error('The room has already game started')
+        }
         this.apply(
             new PlayerReadinessChanged({
                 roomId: this.id,
@@ -252,9 +255,7 @@ export class Room extends AggregateRoot<RoomId> {
 
     public startGame(payload: StartGameCommandSchema) {
         this.validateHost(payload.playerId)
-        if (this.isStarted()) {
-            throw new Error('The game has already started')
-        }
+        this.validateGameStartConditions()
         this.apply(
             new RoomStartedGame({
                 roomId: this.id,
@@ -262,6 +263,21 @@ export class Room extends AggregateRoot<RoomId> {
                 status: RoomStatus.PLAYING,
             }),
         )
+    }
+
+    private validateGameStartConditions() {
+        if (this.players.length < this.minPlayers) {
+            throw new Error('Not enough players')
+        }
+        if (this.players.some((player) => !player.isReady)) {
+            throw new Error('Not all players are ready')
+        }
+        if (this.players.length > this.maxPlayers) {
+            throw new Error('Too many players')
+        }
+        if (this.isStarted()) {
+            throw new Error('The game has already started')
+        }
     }
 
     public endGame() {
