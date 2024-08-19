@@ -8,7 +8,7 @@
 
 ## Quick Start
 
-Clone this project: `git clone https://github.com/NTD-Driven-Development/PullJoker.git`
+Clone this project: `git clone https://github.com/NTD-Driven-Development/lobby.git`
 
 Copy `default.conf.dev` to `default.conf` in the `apps/nginx` folder.
 
