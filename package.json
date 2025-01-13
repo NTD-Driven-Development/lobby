@@ -1,0 +1,17 @@
+{
+  "name": "lobby",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "turbo run start"
+  },
+  "license": "ISC",
+  "packageManager": "pnpm@9.0.0",
+  "dependencies": {
+    "turbo": "^2.3.3"
+  }
+}

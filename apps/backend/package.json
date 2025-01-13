@@ -1,5 +1,5 @@
 {
-    "name": "lobby-backend",
+    "name": "backend",
     "version": "0.0.0",
     "description": "",
     "main": "src/index.ts",
@@ -82,8 +82,8 @@
         "typescript-eslint": "^7.7.1"
     },
     "dependencies": {
-        "@packages/domain": "file:../../packages/domain",
-        "@packages/socket": "file:../../packages/socket",
+        "@packages/domain": "workspace:*",
+        "@packages/socket": "workspace:*",
         "axios": "^1.7.2",
         "dotenv": "^16.4.5",
         "fastify": "^4.26.2",

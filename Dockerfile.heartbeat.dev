@@ -1,0 +1,16 @@
+FROM node:20-slim
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+WORKDIR /app
+COPY apps/heartbeat /app/apps/heartbeat
+COPY packages /app/packages
+COPY turbo.json /app
+COPY pnpm-lock.yaml /app
+COPY pnpm-workspace.yaml /app
+COPY package.json /app
+
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+EXPOSE 2999
+CMD [ "pnpm", "dev" ]

@@ -9,7 +9,7 @@ server {
     
     # reverse proxy with backend socket.io
     location /socket.io {
-        proxy_pass http://backend:3001;
+        proxy_pass http://lobby:3001;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -21,14 +21,14 @@ server {
 
     # reverse proxy with backend api
     location /api {
-        proxy_pass http://backend:3001;
+        proxy_pass http://lobby:3001;
         proxy_set_header Host $host;
     }
 
     # reverse proxy with frontend
     location / {
         proxy_set_header Host $host;
-        proxy_pass http://frontend:3000;
+        proxy_pass http://lobby:3000;
     }
 
 }

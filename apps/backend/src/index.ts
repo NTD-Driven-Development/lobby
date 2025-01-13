@@ -27,8 +27,6 @@ import { GetNewStatusHandler } from './middlewares/get-new-status'
         app.register(socketIO, { cors: { origin: '*' } })
         // prefix api
         app.register(RoomRoutes, { prefix: '/api/rooms' })
-        // app.register(GameRoutes, { prefix: '/api/games' })
-        // app.register(UserRoutes, { prefix: '/api/users' })
         app.ready(async (err) => {
             if (err) throw err
             container.registerInstance('ServerSocket', app.io)

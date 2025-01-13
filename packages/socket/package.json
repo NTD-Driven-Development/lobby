@@ -21,7 +21,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@packages/domain": "file:../domain",
+    "@packages/domain": "workspace:*",
     "socket.io": "^4.7.5",
     "socket.io-client": "^4.7.5"
   }
