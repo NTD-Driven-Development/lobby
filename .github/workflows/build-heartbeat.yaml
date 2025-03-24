@@ -1,0 +1,39 @@
+name: Build and Test Backend
+
+on:
+  push:
+    branches:
+      - main
+    paths: 
+    - 'apps/heartbeat/**'
+    - 'packages/domain/**'
+    - '.github/workflows/**'
+
+  pull_request:
+    branches:
+      - main
+      - dev
+    paths: 
+      - 'apps/heartbeat/**'
+      - 'packages/domain/**'
+      - '.github/workflows/**'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: check out the code
+        uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.0.0
+          run_install: false
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+      - name: Install Package & Setup
+        run: pnpm install --frozen-lockfile --filter=heartbeat... -w
+      - name: Try to build
+        run: pnpm dlx turbo build --filter=heartbeat...
