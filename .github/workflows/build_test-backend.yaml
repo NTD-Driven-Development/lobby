@@ -36,12 +36,8 @@ jobs:
           node-version: 20
           cache: "pnpm"
       - name: Install Package & Setup
-        run: |
-          ( 
-            cd ./apps/backend &&
-            pnpm install --frozen-lockfile
-          )
+        run: pnpm install --frozen-lockfile
       - name: Try to build
-        run: turbo build --filter backend...
+        run: pnpm build -- --filter=backend...
       - name: RUN E2E Test
         run: pnpm test:e2e
