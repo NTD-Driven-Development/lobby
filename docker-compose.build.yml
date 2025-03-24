@@ -1,0 +1,97 @@
+# 最新廢棄了版本 https://docs.docker.com/reference/compose-file/version-and-name/
+# version: "3.8"
+
+services:
+  nginx:
+    container_name: lobby_nginx
+    image: nginx:1.21.4-alpine
+    volumes:
+      - ./apps/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./apps/nginx/default.conf.build:/etc/nginx/conf.d/default.conf
+      - ./apps/nginx:/var/www/
+    ports:
+      - "80:80"
+    networks:
+      - lobby_network
+    depends_on:
+      - frontend
+      - backend
+
+  frontend:
+    container_name: lobby_web
+    build:
+      context: .
+      dockerfile: ./apps/frontend/Dockerfile
+    image: lobby_web:${VERSION:-latest}
+    restart: always
+    environment:
+      - NUXT_PUBLIC_API_HOST=http://localhost
+    ports:
+      - 3000:3000
+    networks:
+      - lobby_network
+
+  backend:
+    container_name: lobby_api
+    build:
+      context: .
+      dockerfile: ./apps/backend/Dockerfile
+    image: lobby_api:${VERSION:-latest} 
+    restart: always
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=db
+      - DB_PORT=5432
+    ports:
+      - 8000:8000
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - lobby_network
+
+  heartbeat:
+    container_name: lobby_heartbeat
+    build:
+      context: .
+      dockerfile: ./apps/heartbeat/Dockerfile
+    image: lobby_heartbeat:${VERSION:-latest}
+    restart: always
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=db
+      - DB_PORT=5432
+    # ports:
+    #   - 7999:7999
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - lobby_network
+
+  db:
+    container_name: lobby_db
+    image: postgres:16-alpine3.19
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: lobby
+    ports:
+      - "5432:5432"
+    networks:
+      - lobby_network
+# Define a network, which allows containers to communicate
+# with each other, by using their container name as a hostname
+networks:
+  lobby_network:
+    # external: true
+volumes:
+  db-data:

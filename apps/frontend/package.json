@@ -4,9 +4,10 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": "nuxt dev --host",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
+    "start": "nuxt preview",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
@@ -15,7 +16,7 @@
     "@packages/socket": "workspace:*",
     "@pinia/nuxt": "^0.5.1",
     "lodash-es": "^4.17.21",
-    "nuxt": "^3.11.2",
+    "nuxt": "^3.16.1",
     "pinia": "^2.1.7",
     "primevue": "^3.52.0",
     "socket.io-client": "^4.7.5",

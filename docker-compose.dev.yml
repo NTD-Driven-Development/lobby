@@ -5,14 +5,12 @@ services:
     image: nginx:1.21.4-alpine
     volumes:
       - ./apps/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./apps/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./apps/nginx/default.conf.dev:/etc/nginx/conf.d/default.conf
       - ./apps/nginx:/var/www/
     ports:
       - "80:80"
     networks:
       - docker
-    depends_on:
-      - lobby
 
   db:
     image: postgres:16-alpine3.19
@@ -38,27 +36,6 @@ services:
   #     - "5433:5432"
   #   networks:
   #     - docker
-
-  heartbeat:
-    build:
-      context: .
-      dockerfile: Dockerfile.heartbeat.dev
-    restart: unless-stopped
-    depends_on:
-      - db
-    networks:
-      - docker
-  lobby:
-    build:
-      context: .
-      dockerfile: Dockerfile.lobby.dev
-    restart: unless-stopped
-    environment:
-      - NUXT_PUBLIC_BACKEND_URL=http://localhost:80
-    depends_on:
-      - db
-    networks:
-      - docker
 
 networks:
   docker:

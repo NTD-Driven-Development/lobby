@@ -1,9 +1,11 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
+      "dependsOn": ["^build", "^package:setup"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": ["dist/**", ".nuxt/**", ".output/**"]
     },
     "dev": {
       "cache": false,
@@ -12,6 +14,10 @@
     "start": {
       "cache": false,
       "persistent": true
+    },
+    "package:setup": {
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": ["dist/**"]
     }
   }
 }

@@ -1,14 +1,9 @@
 **/node_modules
 out
 
-# Storage
-**/storage/
-
 **/.git
 
 **/generated
-
-node_modules
 
 **/dist
 

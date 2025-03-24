@@ -11,7 +11,6 @@ declare global {
             DB_PASSWORD: string
             DB_NAME: string
             HEARTBEAT_INTERVAL: string
-            LABBY_API_URL: string
         }
     }
 }
