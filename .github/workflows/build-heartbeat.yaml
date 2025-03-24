@@ -1,4 +1,4 @@
-name: Build and Test Backend
+name: Build the Heartbeat Service
 
 on:
   push:

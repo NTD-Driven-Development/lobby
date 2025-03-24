@@ -1,11 +1,11 @@
-name: Build and Testing Backend Service
+name: Build the Web Frontend Service
 
 on:
   push:
     branches:
       - main
     paths: 
-    - 'apps/backend/**'
+    - 'apps/frontend/**'
     - 'packages/**'
     - '.github/workflows/**'
 
@@ -14,7 +14,7 @@ on:
       - main
       - dev
     paths: 
-      - 'apps/backend/**'
+      - 'apps/frontend/**'
       - 'packages/**'
       - '.github/workflows/**'
 
@@ -22,8 +22,6 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Docker
-        uses: docker/setup-docker-action@v4
       - name: check out the code
         uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -36,8 +34,6 @@ jobs:
           node-version: 20
           cache: "pnpm"
       - name: Install Package & Setup
-        run: pnpm install --frozen-lockfile --filter=backend... -w
+        run: pnpm install --frozen-lockfile --filter=frontend... -w
       - name: Try to build
-        run: pnpm dlx turbo build --filter=backend...
-      - name: RUN E2E Test
-        run: pnpm test:e2e
+        run: pnpm dlx turbo build --filter=frontend...
