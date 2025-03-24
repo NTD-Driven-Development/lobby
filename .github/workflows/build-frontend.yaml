@@ -19,7 +19,7 @@ on:
       - '.github/workflows/**'
 
 jobs:
-  build-and-test:
+  setup-and-build:
     runs-on: ubuntu-latest
     steps:
       - name: check out the code
