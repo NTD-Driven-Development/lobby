@@ -18,6 +18,10 @@
     "package:setup": {
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": ["dist/**"]
+    },
+    "test:e2e": {
+      "dependsOn": ["^package:setup"],
+      "cache": false
     }
   }
 }
