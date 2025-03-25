@@ -1,0 +1,12 @@
+**/node_modules
+out
+
+**/.git
+
+**/generated
+
+**/dist
+
+**/.nuxt
+
+**/.output

@@ -1,12 +1,13 @@
 {
     "name": "heartbeat",
     "version": "0.0.1",
+    "private": true,
     "description": "",
     "main": "src/index.ts",
     "scripts": {
         "rebuild": "rm -rf ./dist && npm run build",
         "build": "cross-env NODE_ENV=production esbuild --bundle --platform=node --target=node18 --outdir=dist src/index.ts",
-        "start": "cross-env NODE_ENV=production node dist/index",
+        "start": "node dist/index",
         "dev": "cross-env NODE_ENV=development ts-node-dev -r tsconfig-paths/register --project .  --respawn src/index.ts",
         "format": "prettier --no-error-on-unmatched-pattern --write \"src/**/*.ts\" \"test/**/*.ts\"",
         "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint \"{src,apps,libs,test}/**/*.ts\""
@@ -15,13 +16,14 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "@packages/domain": "file:../../packages/domain",
+        "@packages/domain": "workspace:*",
         "axios": "^1.7.2",
         "dotenv": "^16.4.5",
         "http": "^0.0.1-security",
         "pg": "^8.12.0",
         "reflect-metadata": "^0.2.2",
         "tsyringe": "^4.8.0",
+        "cross-env": "^7.0.3",
         "typeorm": "^0.3.20"
     },
     "devDependencies": {
@@ -29,7 +31,6 @@
         "@tsconfig/node-lts": "^20.1.3",
         "@typescript-eslint/eslint-plugin": "^7.12.0",
         "@typescript-eslint/parser": "^7.12.0",
-        "cross-env": "^7.0.3",
         "esbuild": "^0.21.5",
         "eslint": "^8.57.0",
         "eslint-config-airbnb-base": "^15.0.0",

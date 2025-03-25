@@ -1,0 +1,43 @@
+name: Build and Testing Backend Service
+
+on:
+  push:
+    branches:
+      - main
+    paths: 
+    - 'apps/backend/**'
+    - 'packages/**'
+    - '.github/workflows/**'
+
+  pull_request:
+    branches:
+      - main
+      - dev
+    paths: 
+      - 'apps/backend/**'
+      - 'packages/**'
+      - '.github/workflows/**'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v4
+      - name: check out the code
+        uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.0.0
+          run_install: false
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+      - name: Install Package & Setup
+        run: pnpm install --frozen-lockfile --filter=backend... -w
+      - name: Try to build
+        run: pnpm dlx turbo build --filter=backend...
+      - name: RUN E2E Test
+        run: pnpm test:e2e

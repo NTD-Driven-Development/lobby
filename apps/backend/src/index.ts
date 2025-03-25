@@ -15,6 +15,14 @@ import { container } from 'tsyringe'
 import { auth0Middleware } from '~/middlewares'
 import { AppDataSource } from './data/data-source'
 import { GetNewStatusHandler } from './middlewares/get-new-status'
+;['SIGINT', 'SIGTERM', 'SIGQUIT'].forEach((signal) =>
+    process.on(signal, async () => {
+        /** do your logic */
+        console.log('Server shutting down...')
+        await AppDataSource.destroy()
+        process.exit()
+    }),
+)
 ;(async () => {
     try {
         // import { UserRoutes, RoomRoutes, GameRoutes } from '~/routes'
@@ -27,8 +35,6 @@ import { GetNewStatusHandler } from './middlewares/get-new-status'
         app.register(socketIO, { cors: { origin: '*' } })
         // prefix api
         app.register(RoomRoutes, { prefix: '/api/rooms' })
-        // app.register(GameRoutes, { prefix: '/api/games' })
-        // app.register(UserRoutes, { prefix: '/api/users' })
         app.ready(async (err) => {
             if (err) throw err
             container.registerInstance('ServerSocket', app.io)

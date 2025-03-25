@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-    import _ from 'lodash';
+    import _ from 'lodash-es';
 
     const appStore = useAppStore();
     const { app } = appStore;

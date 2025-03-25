@@ -21,11 +21,11 @@ export class GameService {
             console.log('No game found')
             return
         }
+        const agent = axios.create({
+            httpAgent: new http.Agent({ keepAlive: false }),
+        })
         for await (const game of games) {
-            console.log(`Game: ${game.name} is ${game.status}`)
-            const agent = axios.create({
-                httpAgent: new http.Agent({ keepAlive: false }),
-            })
+            console.log(`Game: ${game.name}-${game.backendUrl} is ${game.status}`)
             agent
                 .get(`${game.backendUrl}/api/health`)
                 .then(() => {
