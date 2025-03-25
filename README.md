@@ -3,15 +3,41 @@
 ## Setup
 
 - Ensure you have installed docker (Windows users should install WSL)
-- node = 20.12.2
-- npm package all installed (packages/**, app/\*\*)
+- node.js version >= 20
+- pnpm package all installed (packages/**, apps/\*\*)
 
 ## Quick Start
 
 Clone this project: `git clone https://github.com/NTD-Driven-Development/lobby.git`
 
-Copy `default.conf.dev` to `default.conf` in the `apps/nginx` folder.
+Installation:
 
-Copy `docker-compose.yml.dev` to `docker-compose.yml` in the project root directory.
+```shell
 
-Start the project in the project root directory: `docker compose up`
+pnpm install --frozen-lockfile
+
+```
+
+Development:
+
+```shell
+
+pnpm dev
+
+```
+
+Building:
+
+```shell
+
+pnpm build
+
+```
+
+E2E Testing:
+
+```shell
+
+pnpm test:e2e
+
+```
