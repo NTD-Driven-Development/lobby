@@ -62,6 +62,31 @@ export class Room extends AggregateRoot<RoomId> {
         super(id)
     }
 
+    public createRoom(payload: CreateRoomCommandSchema) {
+        if (
+            payload.minPlayers < payload.game.minPlayers ||
+            payload.maxPlayers > payload.game.maxPlayers
+        ) {
+            throw new Error('Invalid number of players')
+        }
+        this.apply(
+            new RoomCreated({
+                roomId: this.id,
+                name: payload.name,
+                game: payload.game,
+                host: payload.host,
+                currentPlayers: [payload.host],
+                minPlayers: payload.minPlayers,
+                maxPlayers: payload.maxPlayers,
+                password: payload.password,
+                status: RoomStatus.WAITING,
+                isClosed: false,
+                gameUrl: null,
+                createdAt: new Date(),
+            }),
+        )
+    }
+
     protected when(event: DomainEvent): void {
         switch (true) {
             case event instanceof RoomCreated:
@@ -118,59 +143,6 @@ export class Room extends AggregateRoot<RoomId> {
             default:
                 throw new Error('Invalid room event')
         }
-    }
-
-    isStarted() {
-        return this.status === RoomStatus.PLAYING
-    }
-
-    isFull() {
-        return this.players.length >= this.maxPlayers
-    }
-
-    isEmpty() {
-        return this.players.length === 0
-    }
-
-    isHost(playerId: PlayerId) {
-        return this.host.id === playerId
-    }
-
-    isLocked() {
-        return this.password !== null && this.password !== ''
-    }
-
-    public createRoom(payload: CreateRoomCommandSchema) {
-        if (
-            payload.minPlayers < payload.game.minPlayers ||
-            payload.maxPlayers > payload.game.maxPlayers
-        ) {
-            throw new Error('Invalid number of players')
-        }
-        this.apply(
-            new RoomCreated({
-                roomId: this.id,
-                name: payload.name,
-                game: payload.game,
-                host: payload.host,
-                currentPlayers: [payload.host],
-                minPlayers: payload.minPlayers,
-                maxPlayers: payload.maxPlayers,
-                password: payload.password,
-                status: RoomStatus.WAITING,
-                isClosed: false,
-                gameUrl: null,
-                createdAt: new Date(),
-            }),
-        )
-    }
-
-    private addPlayer(player: Player) {
-        this.players.push(player)
-    }
-
-    private removePlayer(playerId: PlayerId) {
-        this.players = this.players.filter((player) => player.id !== playerId)
     }
 
     public changeHost(payload: ChangeHostCommandSchema) {
@@ -301,6 +273,34 @@ export class Room extends AggregateRoot<RoomId> {
                 )
             }
         })
+    }
+
+    private addPlayer(player: Player) {
+        this.players.push(player)
+    }
+
+    private removePlayer(playerId: PlayerId) {
+        this.players = this.players.filter((player) => player.id !== playerId)
+    }
+
+    isStarted() {
+        return this.status === RoomStatus.PLAYING
+    }
+
+    isFull() {
+        return this.players.length >= this.maxPlayers
+    }
+
+    isEmpty() {
+        return this.players.length === 0
+    }
+
+    isHost(playerId: PlayerId) {
+        return this.host.id === playerId
+    }
+
+    isLocked() {
+        return this.password !== null && this.password !== ''
     }
 }
 

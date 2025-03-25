@@ -1,20 +1,22 @@
 {
-  "name": "nuxt-app",
+  "name": "frontend",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": "nuxt dev --host",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
+    "start": "nuxt preview",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
     "@auth0/auth0-spa-js": "^2.1.3",
-    "@packages/domain": "file:../../packages/domain",
-    "@packages/socket": "file:../../packages/socket",
+    "@packages/domain": "workspace:*",
+    "@packages/socket": "workspace:*",
     "@pinia/nuxt": "^0.5.1",
-    "nuxt": "^3.11.2",
+    "lodash-es": "^4.17.21",
+    "nuxt": "^3.16.1",
     "pinia": "^2.1.7",
     "primevue": "^3.52.0",
     "socket.io-client": "^4.7.5",

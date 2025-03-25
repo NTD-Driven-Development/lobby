@@ -1,6 +1,6 @@
 import type { GetRoomResult, GetRoomResultEventSchema, PlayerKicked, PlayerLeftRoom } from '@packages/domain';
 import type { WatchStopHandle } from 'vue';
-import _ from 'lodash';
+import _ from 'lodash-es';
 
 export const useRoomStore = defineStore('room', () => {
     const appStore = useAppStore();
